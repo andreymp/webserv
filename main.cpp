@@ -1,0 +1,60 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/02/17 12:14:07 by jobject           #+#    #+#             */
+/*   Updated: 2022/02/17 20:19:15 by jobject          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "webserv.hpp"
+
+bool checkArgs(int argc, char **argv) {
+	if (argc > 2)
+		return false;
+	if (argc == 1)
+		return true;
+	std::string path(argv[1]);
+	if (path.empty() || path.find(".config") == std::string::npos)
+		return false;
+	if (path.find(".config") + std::strlen(".config") != path.size())
+		return false;
+	return true;
+}
+
+int main(int argc, char **argv) {
+	if (!checkArgs(argc, argv)) {
+		std::cerr << "Wrong arguments" << std::endl;
+		return 1;
+	}
+	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
+	try {
+		
+	} catch (const std::exception & e) {
+		std::cout << e.what() << std::endl;
+	}
+	// if (listen(server_fd, 3) < 0) {
+	// 	std::cerr << "Cannot listen" << std::endl;
+	// 	return 1;
+	// }
+	// int addrlen = sizeof(address);
+	// int newSocket;
+	// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 21\n\nThis is my first page";
+	// while (true) {
+	// 	if ((newSocket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+	// 		std::cerr << "Cannot accept" << std::endl;
+	// 		return 1;
+	// 	}
+	// 	char buffer[30000] = {0};
+    //     int valread = read(newSocket , buffer, 30000);
+    //     printf("%s\n",buffer );
+    //     write(newSocket , hello , strlen(hello));
+    //     printf("------------------Hello message sent-------------------\n");
+    //     close(newSocket);
+
+	// }
+	return 0;
+}
