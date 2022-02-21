@@ -1,9 +1,14 @@
 NAME = webserv
 
 SRCS =	main.cpp \
+		utils.cpp \
 		cnf/Config.cpp \
+		server/Server.cpp \
+		request/Request.cpp \
 
 INC	= 	cnf/Config.hpp \
+		server/Server.hpp \
+		request/Request.hpp \
 		webserv.hpp \
 
 OBJS = $(SRCS:.cpp=.o)
@@ -17,7 +22,9 @@ RM	= rm -rf
 
 $(OBJS_DIR)/%.o:		%.cpp
 						@mkdir -p $(OBJS_DIR)
-						@mkdir -p $(OBJS_DIR)/cnf
+						@mkdir -p	$(OBJS_DIR)/cnf \
+									$(OBJS_DIR)/server \
+									$(OBJS_DIR)/request
 						$(CPP) $(CPP_FLAGS) -c $< -o $@
 
 all:			$(NAME)

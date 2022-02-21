@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/17 19:52:18 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/21 19:36:49 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,10 @@ void Server::setup() {
 	address.sin_port = htons(port);
 	if ((bind(server_fd, (struct sockaddr *) &address, sizeof(address))) < 0) {
 		std::cerr << "Bind failure" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if (listen(server_fd, 100) < 0) {
+		std::cerr << "Cannot listen" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:14:07 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/17 20:19:15 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/21 16:04:05 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ bool checkArgs(int argc, char **argv) {
 	if (argc == 1)
 		return true;
 	std::string path(argv[1]);
-	if (path.empty() || path.find(".config") == std::string::npos)
+	if (path.empty() || path.find(".config") == std::string::npos || path == ".config")
 		return false;
 	if (path.find(".config") + std::strlen(".config") != path.size())
 		return false;
@@ -32,14 +32,10 @@ int main(int argc, char **argv) {
 	}
 	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
 	try {
-		
+		std::vector<Request> requests = conf.parse();
 	} catch (const std::exception & e) {
 		std::cout << e.what() << std::endl;
 	}
-	// if (listen(server_fd, 3) < 0) {
-	// 	std::cerr << "Cannot listen" << std::endl;
-	// 	return 1;
-	// }
 	// int addrlen = sizeof(address);
 	// int newSocket;
 	// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 21\n\nThis is my first page";

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 17:51:45 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/17 19:51:26 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/18 12:06:31 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ class Server {
 		Server(unsigned int _host, int _port);
 		Server(const Server & other);
 		Server & operator=(const Server & other);
+		~Server();
 		long getServerFd() const;
 		void setup();
 		void launch();

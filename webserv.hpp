@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/17 18:04:26 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/21 19:56:00 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,20 @@
 # include <fcntl.h>
 # include <cstdlib>
 # include <poll.h>
+# include <list>
 # include "cnf/Config.hpp"
 # include "server/Server.hpp"
+# include "request/Request.hpp"
 
+struct location {
+	std::string path;
+	std::vector<std::string> methods;
+	std::string root;
+	std::string index;
+	bool allias;
+	std::string cgi_pass;
+};
+
+unsigned int hostToUInt(std::string const & host);
 
 #endif
