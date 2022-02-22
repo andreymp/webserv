@@ -15,12 +15,12 @@ OBJS = $(SRCS:.cpp=.o)
 OBJS_DIR = .obj
 
 CPP	= c++
-CPP_FLAGS = -Wall -Wextra -Werror -std=c++98
+CPP_FLAGS = -Wall -Wextra -Werror -std=c++98 -g
 RM	= rm -rf
 
 .PHONY:			all clean fclean re
 
-$(OBJS_DIR)/%.o:		%.cpp
+$(OBJS_DIR)/%.o:		%.cpp Makefile
 						@mkdir -p $(OBJS_DIR)
 						@mkdir -p	$(OBJS_DIR)/cnf \
 									$(OBJS_DIR)/server \

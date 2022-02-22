@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/21 18:09:07 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/22 14:30:38 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,30 @@ class Request {
 		~Request();
 		void setHost(unsigned int _host);
 		void setPort(int _port);
+		void setClientBodySize(int _size);
 		void setServerName(std::string const & _name);
 		void setRoot(std::string const & path);
 		void setIndex(std::string const & _file);
 		void setMethods(std::vector<std::string> & methods);
-		void setLocation(std::vector<std::list<location> > const & locale);
+		void setLocation(std::vector<location> const & locale);
+		
 		unsigned int getHost() const;
 		int getPort() const;
+		int getClinetBodySize() const;
 		std::string const & getServerName() const;
 		std::string const & getRoot() const;
 		std::string const & getIndex() const;
 		std::vector<std::string> const & getMethods() const;
-		std::vector<std::list<location> > const & getLocation() const;
+		std::vector<location> const & getLocation() const;
 	private:
 		unsigned int host;
 		int port;
+		int client_body_size;
 		std::string serverName;
 		std::string root;
 		std::string index;
 		std::vector<std::string> methods;
-		std::vector<std::list<location> > loc;
+		std::vector<location> loc;
 };
 
 #endif

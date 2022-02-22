@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:34:07 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/21 20:06:17 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/22 14:05:18 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class Config {
 		
 		std::string readFile() const;
 		Request parseServer(std::size_t & i, std::string const & file) const;
-		std::vector<std::list<location> > parseLocation(std::size_t & i, std::string const & file) const;
+		location parseLocation(std::size_t & i, std::string const & file) const;
 };
 
 # endif
