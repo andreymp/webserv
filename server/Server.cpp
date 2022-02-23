@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 15:28:23 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/23 19:46:39 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void Server::setAddress() {
 }
 
 
-long Server::makeNonBlocking() const {
+int Server::makeNonBlocking() const {
 	int socket_fd, addrlen = sizeof(address);
 	if ((socket_fd = accept(server_fd, (struct sockaddr *) &address, (socklen_t*) &addrlen)) < 0) {
 		std::cerr << "Accept failure" << std::endl;
@@ -49,9 +49,7 @@ long Server::makeNonBlocking() const {
 	return socket_fd;
 }
 
-void Server::closeServer(int socket_fd) const {
-	close(socket_fd);
-}
+void Server::closeServer(int socket_fd) const { close(socket_fd); }
 
 void Server::setup() {
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -67,8 +65,4 @@ void Server::setup() {
 		std::cerr << "Cannot listen" << std::endl;
 		throw Server::ServerException();
 	}
-}
-
-void Server::launch() {
-		
 }

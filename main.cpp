@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:14:07 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 12:03:15 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/23 17:49:57 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,26 +33,10 @@ int main(int argc, char **argv) {
 	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
 	try {
 		std::vector<Request> requests(conf.parse());
-		// std::cout << "-----------" << requests.size() << "-------------" << std::endl;
-		// for (std::size_t i = 0; i < requests.size(); ++i) {
-		// 	std::cout << requests[i].getServerName() << std::endl
-		// 		<< requests[i].getHost() << ":" << requests[i].getPort() << std::endl
-		// 		<< requests[i].getRoot() << std::endl << requests[i].getIndex() << std::endl;
-		// 		for (std::size_t j = 0; j < requests[i].getMethods().size(); j++)
-		// 			std::cout << requests[i].getMethods()[j] + " ";
-		// 		std::cout << std::endl;
-		// 		std::cout << "-----------" << requests[i].getLocation().size() << "-------------" << std::endl;
-		// 		for (std::size_t j = 0; j < requests[i].getLocation().size(); j++) {
-		// 			std::cout << "location " + requests[i].getLocation()[j].path << std::endl
-		// 		<< requests[i].getLocation()[j].root << std::endl << requests[i].getLocation()[j].index << std::endl
-		// 		<< requests[i].getLocation()[j].client_body_size << std::endl << requests[i].getLocation()[j].cgi_path << std::endl
-		// 		<< requests[i].getLocation()[j].cgi_extension << std::endl << requests[i].getLocation()[j].autoindex << std::endl;
-		// 		std::cout << "--------" << requests[i].getLocation()[j].methods.size() << "--------" << std::endl;
-		// 		for (std::size_t k = 0; k < requests[i].getLocation()[j].methods.size(); k++)
-		// 			std::cout << requests[i].getLocation()[j].methods[k] + " ";
-		// 		}
-		// 		std::cout << std::endl;
-		// }
+		ServerHandler server(requests);
+		server.setup();
+		server.launch();
+		server.closeConnection();
 	} catch (const std::exception & e) {
 		std::cout << e.what() << std::endl;
 	}
