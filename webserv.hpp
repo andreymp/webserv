@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/22 19:19:44 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/23 12:43:35 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
 # include <fcntl.h>
 # include <cstdlib>
 # include <poll.h>
-# include <list>
+# include <sys/select.h>
+# include <limits>
 # include "cnf/Config.hpp"
 # include "server/Server.hpp"
 # include "request/Request.hpp"

@@ -5,10 +5,12 @@ SRCS =	main.cpp \
 		cnf/Config.cpp \
 		server/Server.cpp \
 		request/Request.cpp \
+		server_handler/ServerHandler.cpp \
 
 INC	= 	cnf/Config.hpp \
 		server/Server.hpp \
 		request/Request.hpp \
+		server_handler/ServerHandler.hpp \
 		webserv.hpp \
 
 OBJS = $(SRCS:.cpp=.o)
@@ -24,7 +26,8 @@ $(OBJS_DIR)/%.o:		%.cpp Makefile
 						@mkdir -p $(OBJS_DIR)
 						@mkdir -p	$(OBJS_DIR)/cnf \
 									$(OBJS_DIR)/server \
-									$(OBJS_DIR)/request
+									$(OBJS_DIR)/request \
+									$(OBJS_DIR)/server_handler
 						$(CPP) $(CPP_FLAGS) -c $< -o $@
 
 all:			$(NAME)
