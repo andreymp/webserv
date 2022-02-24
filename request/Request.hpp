@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/22 14:30:38 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/24 18:51:09 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class Request {
 		void setIndex(std::string const & _file);
 		void setMethods(std::vector<std::string> & methods);
 		void setLocation(std::vector<location> const & locale);
+		void setAutoindex(bool flag);
 		
 		unsigned int getHost() const;
 		int getPort() const;
@@ -39,6 +40,7 @@ class Request {
 		std::string const & getIndex() const;
 		std::vector<std::string> const & getMethods() const;
 		std::vector<location> const & getLocation() const;
+		bool getAutoindex() const;
 	private:
 		unsigned int host;
 		int port;
@@ -48,6 +50,7 @@ class Request {
 		std::string index;
 		std::vector<std::string> methods;
 		std::vector<location> loc;
+		bool autoindex;
 };
 
 #endif

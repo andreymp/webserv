@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 17:55:32 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/24 18:24:50 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,27 @@ int Server::recieve(int socket_fd) {
 }
 
 int Server::send(int socket_fd) {
-	,,
-	return 1;
+	static std::map<int, unsigned int> sentMessages;
+	if (sentMessages.find(socket_fd) == sentMessages.end())
+		sentMessages.insert(std::make_pair(socket_fd, 0));
+	if (!sentMessages[socket_fd])
+		std::cout << messages[socket_fd] << std::endl;
+	std::string msgToSend = messages[socket_fd].substr(sentMessages[socket_fd], DEFUALT_SIZE);
+	int ret = ::send(socket_fd, msgToSend.c_str(), msgToSend.size(), 0);
+	if (ret >= 0) {
+		sentMessages[socket_fd] += ret;
+		if (sentMessages[socket_fd] < messages[socket_fd].size())
+			return 1;
+		else {
+			messages.erase(socket_fd);
+			sentMessages[socket_fd] = 0;
+			return 0;
+		}
+	} else {
+		closeServer(socket_fd);
+		sentMessages[socket_fd] = 0;
+		return ret;
+	}
 }
 
 

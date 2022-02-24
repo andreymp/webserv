@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 17:22:26 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/24 18:13:45 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 # include <poll.h>
 # include <sys/time.h>
 # include <sys/select.h>
+# include <sys/socket.h>
+# include <sys/types.h>
 # include "cnf/Config.hpp"
 # include "server/Server.hpp"
 # include "request/Request.hpp"

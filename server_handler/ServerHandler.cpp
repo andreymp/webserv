@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 17:27:03 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/24 18:28:02 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,24 +65,11 @@ void ServerHandler::launch() {
 			ret = select(maxFD + 1, &readingSet, &writingSet, NULL, &timeout);
 		}
 		if (ret > 0) {
-			// Accepting sockets
-			for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end() && ret; ++it)
-				if (FD_ISSET(it->first, &readingSet)) {
-					int tmpSocket;
-					if ((tmpSocket = it->second.makeNonBlocking()) >= 0) {
-						FD_SET(tmpSocket, &readingSet);
-						sockets.insert(std::make_pair(tmpSocket, &it->second));
-						if (tmpSocket > maxFD)
-							maxFD = tmpSocket;
-					}
-					ret = 0;
-					break ;	
-				}
 			// Sending
 			for (int i = 0; i < fill.size() && ret; ++i) {
 				std::vector<int>::iterator it = fill.begin() + i;
 				if (FD_ISSET(fill.at(i), &writingSet)) {
-					// making send to client
+					ret = sockets[fill.at(i)]->send(fill.at(i));
 					if (ret == -1) {
 						FD_CLR(fill.at(i), &fds);
 						FD_CLR(fill.at(i), &readingSet);
@@ -110,6 +97,19 @@ void ServerHandler::launch() {
 					break;	
 				}
 			}
+			// Accepting sockets
+			for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end() && ret; ++it)
+				if (FD_ISSET(it->first, &readingSet)) {
+					int tmpSocket;
+					if ((tmpSocket = it->second.makeNonBlocking()) >= 0) {
+						FD_SET(tmpSocket, &readingSet);
+						sockets.insert(std::make_pair(tmpSocket, &it->second));
+						if (tmpSocket > maxFD)
+							maxFD = tmpSocket;
+					}
+					ret = 0;
+					break ;	
+				}
 		} else {
 			for (std::map<int, Server *>::iterator it = sockets.begin(); it != sockets.end(); ++it)
 				it->second->closeServer(it->first);

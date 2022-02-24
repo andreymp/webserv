@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:37:06 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/22 19:18:59 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/24 18:54:01 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,11 @@ Request Config::parseServer(std::size_t & i, std::string const & file) const {
 				throw Config::ConfigException();
 			req.setIndex(file.substr(i, tmp - i));
 			i = tmp + 1;
+		} else if (!file.compare(i, std::strlen("autoindex "), "autoindex ")) {
+			i += std::strlen("autoindex ");
+			if (!file.compare(i, 2, "on"))
+				req.setAutoindex(true);
+			i += req.getAutoindex() ? 2 : 3; 
 		} else if (!file.compare(i, std::strlen("allow_methods "), "allow_methods ")) {
 			i += std::strlen("allow_methods ");
 			std::vector<std::string> allowMeth;
