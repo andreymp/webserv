@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 17:14:27 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/24 17:55:32 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ int Server::recieve(int socket_fd) {
 }
 
 int Server::send(int socket_fd) {
+	,,
 	return 1;
 }
 
