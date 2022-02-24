@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 20:18:33 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/24 17:27:03 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,15 @@ ServerHandler & ServerHandler::operator=(const ServerHandler & other) {
 		servers = other.servers;
 		maxFD = other.maxFD;
 	}
-	retrun *this;
+	return *this;
 }
 
 const char * ServerHandler::ServerHandlerException::what() const throw() { return "ServerHandler exception occured"; }
 
 void ServerHandler::setup() {
 	FD_ZERO(&fds);
-	for (Request elem : reqArray) {
-		Server tmp(elem.getHost(), elem.getPort());
+	for (int i = 0; i < reqArray.size(); ++i) {
+		Server tmp(reqArray[i].getHost(), reqArray[i].getPort());
 		tmp.setup();
 		int tmpFD = tmp.getServerFd();
 		FD_SET(tmpFD, &fds);
@@ -53,7 +53,7 @@ void ServerHandler::launch() {
 	while (true) {
 		fd_set 			readingSet;
 		fd_set 			writingSet;
-		struct timaval	timeout;
+		struct timeval	timeout;
 		int ret = 0;
 		while (!ret) {
 			timeout.tv_sec = 0;
@@ -66,42 +66,45 @@ void ServerHandler::launch() {
 		}
 		if (ret > 0) {
 			// Accepting sockets
-			for (std::map<int, Server>::iterator it = servers.begin(); it != end() && ret; ++it)
+			for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end() && ret; ++it)
 				if (FD_ISSET(it->first, &readingSet)) {
 					int tmpSocket;
 					if ((tmpSocket = it->second.makeNonBlocking()) >= 0) {
 						FD_SET(tmpSocket, &readingSet);
 						sockets.insert(std::make_pair(tmpSocket, &it->second));
 						if (tmpSocket > maxFD)
-							maxFD = tmpSocketl
+							maxFD = tmpSocket;
 					}
 					ret = 0;
 					break ;	
 				}
 			// Sending
-			for (int i = 0; i < fill.size() && ret; ++i)
+			for (int i = 0; i < fill.size() && ret; ++i) {
+				std::vector<int>::iterator it = fill.begin() + i;
 				if (FD_ISSET(fill.at(i), &writingSet)) {
 					// making send to client
 					if (ret == -1) {
 						FD_CLR(fill.at(i), &fds);
 						FD_CLR(fill.at(i), &readingSet);
-						fill.erase(fill.at(i));
-						sockets.erase(std::map<int, Server *>::iterator(fill.at(i)));
+						fill.erase(it);	
+						sockets.erase(fill.at(i));
 					} else if (!ret)
-						fill.erase(std::vector<int>::iterator(fill.at(i)));
+						fill.erase(it);
 					ret = 0;
 					break ;
 				}
+			}
 			// Recieving
 			for (std::map<int, Server *>::iterator it = sockets.begin(); it != sockets.end(); ++it) {
 				if (FD_ISSET(it->first, &readingSet)) {
-					//  making recieving from client
+					ret = it->second->recieve(it->first);
 					if (ret == -1) {
 						FD_CLR(it->first, &fds);
 						FD_CLR(it->first, &readingSet);
 						sockets.erase(it->first);
 					} else if (!ret) {
 						// proccecing with recieving
+						fill.push_back(it->first);
 					}
 					ret = 0;
 					break;	

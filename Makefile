@@ -17,7 +17,7 @@ OBJS = $(SRCS:.cpp=.o)
 OBJS_DIR = .obj
 
 CPP	= c++
-CPP_FLAGS = -Wall -Wextra -Werror -std=c++98 -g
+CPP_FLAGS = # -Wall -Wextra -Werror -std=c++98 -g
 RM	= rm -rf
 
 .PHONY:			all clean fclean re
