@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SevrerHandler.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 15:45:17 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 16:05:12 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/26 00:00:43 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,25 @@
 
 # include "../webserv.hpp"
 
-class ServerHadndler {
+class ServerHandler {
 	public:
-		ServerHadndler();
-		~ServerHadndler();
+		explicit ServerHandler(std::vector<Request> & req);
+		ServerHandler(const ServerHandler & other);
+		ServerHandler & operator=(const ServerHandler & other);
+		virtual ~ServerHandler();
+		void setup();
+		void launch();
+		void closeConnection();
+		class ServerHandlerException : public std::exception {
+			virtual const char * what() const throw();	
+		};
 	private:
-		std::vector<Request> ReqArray;
+		ServerHandler();
+		
+		std::vector<Request> reqArray;
+		std::map<int, Server> servers;
 		long maxFD;
+		fd_set fds;
 };
 
 #endif

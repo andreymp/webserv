@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 15:28:23 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/26 00:02:34 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Server::Server() {}
 Server::~Server() {}
-Server::Server(unsigned int _host, int _port) : host(_host), port(_port) {}
+Server::Server(unsigned int _host, int _port) : host(_host), port(_port), messages() {}
 Server::Server(const Server & other) { *this = other; }
 Server & Server::operator=(const Server & other) {
 	if (this != &other) {
@@ -22,6 +22,7 @@ Server & Server::operator=(const Server & other) {
 		port = other.port;
 		server_fd = other.server_fd;
 		address = other.address;
+		messages = other.messages;
 	}
 	return *this;
 }
@@ -38,20 +39,75 @@ void Server::setAddress() {
 }
 
 
-long Server::makeNonBlocking() const {
+int Server::makeNonBlocking() {
 	int socket_fd, addrlen = sizeof(address);
 	if ((socket_fd = accept(server_fd, (struct sockaddr *) &address, (socklen_t*) &addrlen)) < 0) {
 		std::cerr << "Accept failure" << std::endl;
 		throw Server::ServerException();
 	}
-	if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
+	else if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
 		throw Server::ServerException();
+	messages.insert(std::make_pair(socket_fd, std::string("")));
 	return socket_fd;
 }
 
-void Server::closeServer(int socket_fd) const {
-	close(socket_fd);
+#define DEFUALT_SIZE 65536
+
+int Server::recieve(int socket_fd) {
+	char buffer[DEFUALT_SIZE];
+	int ret = recv(socket_fd, buffer, DEFUALT_SIZE - 1, 0);
+	if (ret == -1) {
+		closeServer(socket_fd);
+		std::cout << "Error while reading" << std::endl;
+		return ret;
+	}
+	if (!ret) {
+		closeServer(socket_fd);
+		std::cout << "Connection closed by client" << std::endl;
+		return ret;
+	}
+	messages[socket_fd].append(buffer);
+	if (messages[socket_fd].find("\r\n\r\n") != std::string::npos) {
+		if (messages[socket_fd].find("Content-Length: ") == std::string::npos) {
+			if (messages[socket_fd].find("Transfer-Encoding: chunked") == std::string::npos)
+				return 0;
+			else {
+				std::size_t j = messages[socket_fd].find("0\r\n\r\n");
+				return j != std::string::npos && j + 5 == messages[socket_fd].size() ? 0 : 1;
+			}
+			size_t	cl = std::atoi(messages[socket_fd].substr(messages[socket_fd].find("Content-Length: ") + 16, 10).c_str());
+			return messages[socket_fd].size() < cl + messages[socket_fd].find("\r\n\r\n") + 4 ? 1 : 0;
+		}
+	}
+	return 1;
 }
+
+int Server::send(int socket_fd) {
+	static std::map<int, unsigned int> sentMessages;
+	if (sentMessages.find(socket_fd) == sentMessages.end())
+		sentMessages.insert(std::make_pair(socket_fd, 0));
+	if (!sentMessages[socket_fd])
+		std::cout << messages[socket_fd] << std::endl;
+	std::string msgToSend = messages[socket_fd].substr(sentMessages[socket_fd], DEFUALT_SIZE);
+	int ret = ::send(socket_fd, msgToSend.c_str(), msgToSend.size(), 0);
+	if (ret >= 0) {
+		sentMessages[socket_fd] += ret;
+		if (sentMessages[socket_fd] < messages[socket_fd].size())
+			return 1;
+		else {
+			messages.erase(socket_fd);
+			sentMessages[socket_fd] = 0;
+			return 0;
+		}
+	} else {
+		closeServer(socket_fd);
+		sentMessages[socket_fd] = 0;
+		return ret;
+	}
+}
+
+
+void Server::closeServer(int socket_fd) const { close(socket_fd); }
 
 void Server::setup() {
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -67,8 +123,4 @@ void Server::setup() {
 		std::cerr << "Cannot listen" << std::endl;
 		throw Server::ServerException();
 	}
-}
-
-void Server::launch() {
-		
 }

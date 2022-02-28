@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 17:51:45 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 12:34:53 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/26 00:02:48 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,20 +23,23 @@ class Server {
 		virtual ~Server();
 		long getServerFd() const;
 		void setup();
-		void launch();
+		int send(int socket_fd);
+		int recieve(int socket_fd);
 		void closeServer(int socket_fd) const;
+		int makeNonBlocking();
 		class ServerException : public std::exception {
 			virtual const char * what() const throw();
 		};
 	private:
 		Server();
-		long server_fd;
+
+		int server_fd;
 		struct sockaddr_in address;
 		unsigned int host;
 		int port;
+		std::map<int, std::string> messages;
 
 		void setAddress();
-		long makeNonBlocking() const;
 };
 
 #endif

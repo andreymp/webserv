@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 12:43:35 by jobject          ###   ########.fr       */
+/*   Updated: 2022/02/26 00:02:02 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,18 @@
 # include <iostream>
 # include <string>
 # include <cstring>
+# include <limits>
+# include <map>
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include <cstdlib>
 # include <poll.h>
+# include <sys/time.h>
 # include <sys/select.h>
-# include <limits>
+# include <sys/socket.h>
+# include <sys/types.h>
 # include "cnf/Config.hpp"
 # include "server/Server.hpp"
 # include "request/Request.hpp"

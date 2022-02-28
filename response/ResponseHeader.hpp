@@ -2,7 +2,7 @@
 # define RESPONSEHEADER_HPP
 
 # include "webserv.hpp"
-
+# include <set>
 class ResponseHeader {
 public:
 	ResponseHeader(void);
@@ -35,6 +35,7 @@ public:
 	std::string		getStatusMessage(int code);
 
 private:
+	std::map<int, std::string>	_errors;
 	std::string					_allow;
 	std::string					_contentLanguage;
 	std::string					_contentLength;
@@ -47,7 +48,6 @@ private:
 	std::string					_server;
 	std::string					_transferEncoding;
 	std::string					_wwwAuthenticate;
-	std::map<int, std::string>	_errors;
 
 	void						initErrorMap();
 };

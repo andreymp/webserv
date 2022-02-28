@@ -1,5 +1,7 @@
 #include "ResponseHeader.hpp"
 #include <set>
+#include <sys/time.h>
+#include <sys/stat.h>
 // Member functions
 
 std::string		ResponseHeader::getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
@@ -206,6 +208,7 @@ void			ResponseHeader::setLastModified(const std::string& path)
 	}
 }
 
+//????
 void			ResponseHeader::setLocation(int code, const std::string& redirect)
 {
 	if (code == 201 || code / 100 == 3)
@@ -213,6 +216,18 @@ void			ResponseHeader::setLocation(int code, const std::string& redirect)
 		_location = redirect;
 	}
 }
+
+/*
+Retry-After заголовок HTTP ответа показывает,
+как долго клиент должен подождать перед последующим запросом. 
+Есть три основных случая, в которых следует использовать этот заголовок:
+Когда отправлен с кодом 503 (Service Unavailable), отображая примерное время, 
+через которое сервис будет доступен.
+Когда отправлен с кодом 429 (Too Many Requests), отображая, сколько ждать 
+перед следующим запросом.
+Когда отправлен с кодом переадресации (например, 301 (Moved Permanently)),
+ отображает минимальное время, которое клиент должен подождать перед переадресацией.
+*/
 
 void			ResponseHeader::setRetryAfter(int code, int sec)
 {
@@ -247,8 +262,6 @@ ResponseHeader & ResponseHeader::operator=(const ResponseHeader & src)
 	(void)src;
 	return (*this);
 }
-
-// Constructors and destructors
 
 ResponseHeader::ResponseHeader(void)
 {

@@ -61,6 +61,26 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "unordered_map": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "set": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "__bits": "cpp",
+        "clocale": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "condition_variable": "cpp",
+        "numbers": "cpp",
+        "numeric": "cpp",
+        "queue": "cpp",
+        "random": "cpp",
+        "semaphore": "cpp",
+        "thread": "cpp",
+        "memory_resource": "cpp",
+        "stop_token": "cpp",
+        "codecvt": "cpp",
+        "iomanip": "cpp",
+        "stack": "cpp",
+        "fstream": "cpp"
     }
 }
