@@ -1,11 +1,7 @@
 #ifndef CGi_HPP
 # define CGi_HPP
 
-# include "webserv.hpp"
-
-# include "Config.hpp"
-# include "Request.hpp"
-
+# include "../webserv.hpp"
 
 class CgiHandler {
 	public:

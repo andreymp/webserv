@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 17:51:45 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/26 00:02:48 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/02 18:02:43 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ class Server {
 		int send(int socket_fd);
 		int recieve(int socket_fd);
 		void closeServer(int socket_fd) const;
+		void handleChunk(int socket_fd);
 		int makeNonBlocking();
+		void recieveHandler(int socket_fd);
 		class ServerException : public std::exception {
 			virtual const char * what() const throw();
 		};

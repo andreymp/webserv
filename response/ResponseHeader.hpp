@@ -1,7 +1,7 @@
 #ifndef RESPONSEHEADER_HPP
 # define RESPONSEHEADER_HPP
 
-# include "webserv.hpp"
+# include "../webserv.hpp"
 # include <set>
 class ResponseHeader {
 public:
@@ -12,7 +12,7 @@ public:
 	ResponseHeader & operator=(const ResponseHeader & src);
 
 	// Setter functions
-	void			setAllow(std::set<std::string> methods);
+	void			setAllow(std::vector<std::string> methods);
 	void			setAllow(const std::string& allow = "");
 	void			setContentLanguage(const std::string& lang = "");
 	void			setContentLength(size_t size);
@@ -28,7 +28,7 @@ public:
 
 	// Member functions
 	std::string		getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
-	std::string		notAllowed(std::set<std::string> methods, const std::string& path, int code, const std::string& lang);
+	std::string		notAllowed(std::vector<std::string> methods, const std::string& path, int code, const std::string& lang);
 	std::string		writeHeader(void);
 	void			setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
 	void			resetValues(void);

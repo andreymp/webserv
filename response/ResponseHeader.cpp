@@ -17,7 +17,7 @@ std::string		ResponseHeader::getHeader(size_t size, const std::string& path, int
 	return (header);
 }
 
-std::string		ResponseHeader::notAllowed(std::set<std::string> methods, const std::string& path, int code, const std::string& lang)
+std::string		ResponseHeader::notAllowed(std::vector<std::string> methods, const std::string& path, int code, const std::string& lang)
 {
 	std::string	header;
 
@@ -123,9 +123,9 @@ void			ResponseHeader::resetValues(void)
 
 // Setter functions
 
-void			ResponseHeader::setAllow(std::set<std::string> methods)
+void			ResponseHeader::setAllow(std::vector<std::string> methods)
 {
-	std::set<std::string>::iterator it = methods.begin();
+	std::vector<std::string>::iterator it = methods.begin();
 
 	while (it != methods.end())
 	{

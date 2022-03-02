@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/26 00:02:02 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/02 21:10:34 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <iostream>
 # include <string>
 # include <cstring>
+# include <cstdlib>
 # include <limits>
 # include <map>
 # include <sys/socket.h>
@@ -31,6 +32,11 @@
 # include "cnf/Config.hpp"
 # include "server/Server.hpp"
 # include "request/Request.hpp"
+# include "response/Response.hpp"
+# include "server_handler/ServerHandler.hpp"
+
+# define END "\r\n\r\n"
+# define CHUNK "Transfer-Encoding: chunked"
 
 struct location {
 	std::string path;

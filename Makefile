@@ -5,6 +5,8 @@ SRCS =	main.cpp \
 		cnf/Config.cpp \
 		server/Server.cpp \
 		request/Request.cpp \
+		response/Response.cpp \
+		response/ResponseHeader.cpp \
 		server_handler/ServerHandler.cpp \
 
 INC	= 	cnf/Config.hpp \
@@ -17,7 +19,7 @@ OBJS = $(SRCS:.cpp=.o)
 OBJS_DIR = .obj
 
 CPP	= c++
-CPP_FLAGS = -Wall -Wextra -Werror -std=c++98 -g
+CPP_FLAGS = #-Wall -Wextra -Werror -std=c++98 -g
 RM	= rm -rf
 
 .PHONY:			all clean fclean re
@@ -27,7 +29,8 @@ $(OBJS_DIR)/%.o:		%.cpp Makefile
 						@mkdir -p	$(OBJS_DIR)/cnf \
 									$(OBJS_DIR)/server \
 									$(OBJS_DIR)/request \
-									$(OBJS_DIR)/server_handler
+									$(OBJS_DIR)/server_handler \
+									$(OBJS_DIR)/response
 						$(CPP) $(CPP_FLAGS) -c $< -o $@
 
 all:			$(NAME)

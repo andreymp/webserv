@@ -1,10 +1,9 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
-# include "webserv.hpp"
+# include "../webserv.hpp"
 # include <map>
 // # include "ResponseHeader.hpp"
-# include "Request.hpp"
 # include "CGI.hpp"
 
 
@@ -23,12 +22,8 @@ public:
 	void			call(Request & request);
 
 	void			getMethod(Request & request);
-	void			headMethod(Request & request);
-	void			postMethod(Request & request);
-	void			putMethod(Request & request);
-	void			deleteMethod(Request & request);
-	void			optionsMethod(Request & request);
-	void			traceMethod(Request & request);
+	// void			postMethod(Request & request);
+	// void			deleteMethod(Request & request);
 
 	int				readContent(void);
 	int				writeContent(std::string content);

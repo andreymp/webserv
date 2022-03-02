@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/26 01:32:52 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/02 19:57:50 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void ServerHandler::launch() {
 						FD_CLR(it->first, &readingSet);
 						sockets.erase(it->first);
 					} else if (!ret) {
-						// proccecing with recieving
+						it->second->recieveHandler(it->first);
 						fill.push_back(it->first);
 					}
 					ret = 0;
