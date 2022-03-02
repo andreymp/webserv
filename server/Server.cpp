@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 16:57:44 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 20:26:35 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int Server::recieve(int socket_fd) {
 			if (messages[socket_fd].find("Transfer-Encoding: chunked") == std::string::npos)
 				return 0;
 			else {
-				std::size_t j = messages[socket_fd].find("0"END);
+				std::size_t j = messages[socket_fd].find("0\r\n\r\n");
 				return j != std::string::npos && j + 5 == messages[socket_fd].size() ? 0 : 1;
 			}
 			size_t	cl = std::atoi(messages[socket_fd].substr(messages[socket_fd].find("Content-Length: ") + 16, 10).c_str());
@@ -112,7 +112,18 @@ void Server::recieveHandler(int socket_fd) {
 		handleChunk(socket_fd);
 	std::cout << messages[socket_fd] << std::endl;
 	if (messages[socket_fd] != "") {
-		
+		Request requestForResponse;
+		if (messages[socket_fd].find("GET") == 0)
+			requestForResponse.setMethod("GET");
+		else if (messages[socket_fd].find("POST") == 0)
+			requestForResponse.setMethod("POST");
+		else if (messages[socket_fd].find("DELETE") == 0)
+			requestForResponse.setMethod("DELETE");
+		else 
+			requestForResponse.setMethod("I am the best");
+		requestForResponse.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
+		messages.erase(socket_fd);
+		std::cout << messages[socket_fd] << std::endl;
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 16:57:20 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 20:36:55 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,21 +48,19 @@ void ServerHandler::closeConnection() {
 }
 
 void ServerHandler::launch() {
-	std::vector<int> fill;
-	std::map<int, Server *> sockets;
 	while (true) {
 		fd_set 			readingSet;
 		fd_set 			writingSet;
 		struct timeval	timeout;
 		int ret = 0;
 		while (!ret) {
-			timeout.tv_sec = 0;
-			timeout.tv_usec = 1;
+			timeout.tv_sec = 1;
+			timeout.tv_usec = 0;
 			std::memcpy(&readingSet, &fds, sizeof(fds));
 			FD_ZERO(&writingSet);
 			for (int i = 0; i < fill.size(); ++i)
 				FD_SET(fill[i], &writingSet);
-			ret = select(maxFD + 1, &readingSet, &writingSet, NULL, &timeout);
+			ret = select(maxFD + 1, &readingSet, &writingSet, nullptr, &timeout);
 		}
 		if (ret > 0) {
 			// Sending
