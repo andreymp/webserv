@@ -5,9 +5,7 @@
 # include <map>
 // # include "ResponseHeader.hpp"
 # include "Request.hpp"
-// # include "RequestConfig.hpp"
-// # include "CgiHandler.hpp"
-// # include "AutoIndexGenerator.hpp"
+# include "CGI.hpp"
 
 
 class Response {

@@ -4,7 +4,6 @@
 #include <sys/stat.h>
 #include <fstream>      // std::ifstream
 #include <sstream>      // std::stringstream
-#include <sstream>
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -69,7 +68,7 @@ std::map<std::string, void (Response::*)(Request &)> Response::_method = Respons
   */
 void			Response::call(Request & request)
 {
-	_errorMap = request.getErrorPage();
+	_errorMap = request.getErrorPage(); // код -> путь до файла
 	_isAutoIndex = request.get_autoindex();
 	_host = request.get_host();
 	_port = request.get_port();
@@ -114,28 +113,28 @@ void			Response::getMethod(Request & request)
 {
 	ResponseHeader	head;
 
-	// if (requestConf.getCgiPass() != "")
-	// {
-	// 	CgiHandler	cgi(request, requestConf);
-	// 	size_t		i = 0;
-	// 	size_t		j = _response.size() - 2;
+	if (request.getCgiPass() != "")
+	{
+		CgiHandler	cgi(request);
+		size_t		i = 0;
+		size_t		j = _response.size() - 2;
 
-	// 	_response = cgi.executeCgi(requestConf.getCgiPass());
+		_response = cgi.executeCgi(request.getCgiPass());
 
-	// 	while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-	// 	{
-	// 		std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
-	// 		if (str.find("Status: ") == 0)
-	// 			_code = std::atoi(str.substr(8, 3).c_str());
-	// 		else if (str.find("Content-type: ") == 0)
-	// 			_type = str.substr(14, str.size());
-	// 		i += str.size() + 2;
-	// 	}
-	// 	while (_response.find("\r\n", j) == j)
-	// 		j -= 2;
+		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
+		{
+			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
+			if (str.find("Status: ") == 0)
+				_code = std::atoi(str.substr(8, 3).c_str());
+			else if (str.find("Content-type: ") == 0)
+				_type = str.substr(14, str.size());
+			i += str.size() + 2;
+		}
+		while (_response.find("\r\n", j) == j)
+			j -= 2;
 
-	// 	_response = _response.substr(i, j - i);
-	// }
+		_response = _response.substr(i, j - i);
+	}
 	if  (_code == 200)
 		_code = readContent();
 	else
@@ -149,7 +148,6 @@ void			Response::getMethod(Request & request)
 void			Response::headMethod(Request & request)
 {
 	ResponseHeader	head;
-	(void)request;
 
 	_code = readContent();
 	_response = head.getHeader(_response.size(), _path, _code, _type, request.getContentLocation(), request.getLang()) + "\r\n";
