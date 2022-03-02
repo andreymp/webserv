@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 18:52:38 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 17:54:54 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ Request & Request::operator=(const Request & other) {
 		methods = other.methods;
 		loc = other.loc;
 		autoindex = other.autoindex;
+		method = other.method;
+		body = other.body;
 	}
 	return *this;
 }
@@ -39,12 +41,23 @@ void Request::setMethods(std::vector<std::string> & _methods) { methods = _metho
 void Request::setLocation(std::vector<location> const & locale) { loc = locale;}
 void Request::setClientBodySize(int _size) { client_body_size = _size; }
 void Request::setAutoindex(bool flag) { autoindex = flag; }
+void Request::setMethod(std::string const & _method) { method = _method; }
+void Request::setBody(std::string const & _body) {
+	body = _body;
+	for (int i = 0; i < 4; ++i) {
+		if (!body.size() || body.at(body.size() - 1) != i % 2 ? '\r' : '\n')
+			break ;
+		body.resize(body.size() - 1);
+	}
+}
 
 unsigned int Request::getHost() const { return host; }
 int Request::getPort() const { return port; }
 std::string const & Request::getServerName() const { return serverName; }
 std::string const & Request::getRoot() const { return root; }
 std::string const & Request::getIndex() const { return index; }
+std::string const & Request::getMethod() const { return method; }
+std::string const & Request::getBody() const { return body; }
 std::vector<std::string> const & Request::getMethods() const { return methods; }
 std::vector<location> const & Request::getLocation() const { return loc; }
 int Request::getClinetBodySize() const { return client_body_size; }

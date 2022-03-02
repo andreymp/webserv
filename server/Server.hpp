@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 17:51:45 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 15:28:15 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 12:41:54 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ class Server {
 		int send(int socket_fd);
 		int recieve(int socket_fd);
 		void closeServer(int socket_fd) const;
+		void handleChunk(int socket_fd);
 		int makeNonBlocking();
+		void recieveHandler(int socket_fd);
 		class ServerException : public std::exception {
 			virtual const char * what() const throw();
 		};

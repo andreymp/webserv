@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 18:24:50 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 16:57:44 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,8 @@ int Server::makeNonBlocking() {
 #define DEFUALT_SIZE 65536
 
 int Server::recieve(int socket_fd) {
-	char buffer[DEFUALT_SIZE];
-	int ret = recv(socket_fd, buffer, DEFUALT_SIZE - 1, 0);
+	char buffer[DEFUALT_SIZE + 1];
+	int ret = recv(socket_fd, buffer, DEFUALT_SIZE, 0);
 	if (ret == -1) {
 		closeServer(socket_fd);
 		std::cout << "Error while reading" << std::endl;
@@ -67,16 +67,16 @@ int Server::recieve(int socket_fd) {
 		return ret;
 	}
 	messages[socket_fd].append(buffer);
-	if (messages[socket_fd].find("\r\n\r\n") != std::string::npos) {
+	if (messages[socket_fd].find(END) != std::string::npos) {
 		if (messages[socket_fd].find("Content-Length: ") == std::string::npos) {
 			if (messages[socket_fd].find("Transfer-Encoding: chunked") == std::string::npos)
 				return 0;
 			else {
-				std::size_t j = messages[socket_fd].find("0\r\n\r\n");
+				std::size_t j = messages[socket_fd].find("0"END);
 				return j != std::string::npos && j + 5 == messages[socket_fd].size() ? 0 : 1;
 			}
 			size_t	cl = std::atoi(messages[socket_fd].substr(messages[socket_fd].find("Content-Length: ") + 16, 10).c_str());
-			return messages[socket_fd].size() < cl + messages[socket_fd].find("\r\n\r\n") + 4 ? 1 : 0;
+			return messages[socket_fd].size() < cl + messages[socket_fd].find(END) + 4 ? 1 : 0;
 		}
 	}
 	return 1;
@@ -104,6 +104,34 @@ int Server::send(int socket_fd) {
 		sentMessages[socket_fd] = 0;
 		return ret;
 	}
+}
+
+void Server::recieveHandler(int socket_fd) {
+	std::size_t chunk = messages[socket_fd].find(CHUNK);
+	if (chunk != std::string::npos && chunk < messages[socket_fd].find(END))
+		handleChunk(socket_fd);
+	std::cout << messages[socket_fd] << std::endl;
+	if (messages[socket_fd] != "") {
+		
+	}
+}
+
+void Server::handleChunk(int socket_fd) {
+	std::string head = messages[socket_fd].substr(0, messages[socket_fd].find(END)) + END;
+	std::string body = "";
+	std::string chunk = messages[socket_fd].substr(messages[socket_fd].find(END) + std::strlen(END), messages[socket_fd].size() - 1);
+	std::string partition = chunk.substr(0, 100);
+	long partitionSize = std::strtol(partition.c_str(), nullptr, 16);
+	
+	for (std::size_t i = 0; partitionSize;) {
+		i = chunk.find("\r\n", i) + 2;
+		body += chunk.substr(i, partitionSize);
+		i += partitionSize + 2;
+		partition = chunk.substr(i, 100);
+		partitionSize = strtol(partition.c_str(), nullptr, 16);
+	}
+	body += END;
+	messages[socket_fd] = head + body;
 }
 
 

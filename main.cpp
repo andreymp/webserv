@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:14:07 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 16:40:33 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 16:02:39 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,22 +33,22 @@ int main(int argc, char **argv) {
 	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
 	try {
 		std::vector<Request> requests(conf.parse());
-		Server server(requests[0].getHost(), requests[0].getPort());
-		server.setup();
-		char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 21\n\nThis is my first page";
-		while (true) {
-			int socket_fd = server.makeNonBlocking();
-				char buffer[30000] = {0};
-        int valread = read(socket_fd , buffer, 30000);
-        printf("%s\n",buffer );
-        write(socket_fd , hello , std::strlen(hello));
-        printf("------------------Hello message sent-------------------\n");
-        close(socket_fd);
-		}
-		// ServerHandler server(requests);
+		// Server server(requests[0].getHost(), requests[0].getPort());
 		// server.setup();
-		// server.launch();
-		// server.closeConnection();
+		// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 21\n\nThis is my first page";
+		// while (true) {
+		// 	int socket_fd = server.makeNonBlocking();
+		// 		char buffer[30000] = {0};
+        // int valread = read(socket_fd , buffer, 30000);
+        // printf("%s\n",buffer );
+        // write(socket_fd , hello , std::strlen(hello));
+        // printf("------------------Hello message sent-------------------\n");
+        // close(socket_fd);
+		// }
+		ServerHandler server(requests);
+		server.setup();
+		server.launch();
+		server.closeConnection();
 	} catch (const std::exception & e) {
 		std::cout << e.what() << std::endl;
 	}
