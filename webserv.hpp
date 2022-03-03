@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 16:29:12 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/03 18:28:11 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <cstdlib>
-# include <poll.h>
+# include <cstddef>
+# include <csignal>
 # include <sys/time.h>
 # include <sys/select.h>
 # include <sys/socket.h>
@@ -33,6 +34,7 @@
 # include "server/Server.hpp"
 # include "request/Request.hpp"
 # include "server_handler/ServerHandler.hpp"
+# include "cgi/CGIHandler.hpp"
 
 # define END "\r\n\r\n"
 # define CHUNK "Transfer-Encoding: chunked"

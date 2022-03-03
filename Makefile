@@ -6,10 +6,12 @@ SRCS =	main.cpp \
 		server/Server.cpp \
 		request/Request.cpp \
 		server_handler/ServerHandler.cpp \
+		cgi/CGIHandler.cpp \
 
 INC	= 	cnf/Config.hpp \
 		server/Server.hpp \
 		request/Request.hpp \
+		cgi/CGIHandler.hpp \
 		server_handler/ServerHandler.hpp \
 		webserv.hpp \
 
@@ -27,7 +29,8 @@ $(OBJS_DIR)/%.o:		%.cpp Makefile
 						@mkdir -p	$(OBJS_DIR)/cnf \
 									$(OBJS_DIR)/server \
 									$(OBJS_DIR)/request \
-									$(OBJS_DIR)/server_handler
+									$(OBJS_DIR)/server_handler \
+									$(OBJS_DIR)/cgi
 						$(CPP) $(CPP_FLAGS) -c $< -o $@
 
 all:			$(NAME)
