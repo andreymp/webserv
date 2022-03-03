@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 15:45:17 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 17:40:42 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 20:34:23 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ class ServerHandler {
 	private:
 		ServerHandler();
 		
+		std::vector<int> fill;
+		std::map<int, Server *> sockets;
 		std::vector<Request> reqArray;
 		std::map<int, Server> servers;
 		long maxFD;

@@ -6,7 +6,7 @@
 /*   By: heveline <heveline@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 18:26:47 by heveline         ###   ########.fr       */
+/*   Updated: 2022/03/03 17:38:31 by heveline         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,6 @@ class Request {
 		std::vector<std::string> const & getMethods() const;
 		std::vector<location> const & getLocation() const;
 		bool getAutoindex() const;
-		const std::string &getUriNoQuery() const;
-		void proccessUri(void);
-		unsigned long getContentLength() const;
-		const std::string &getRequestUri() const;
-		const std::string &getQueryString() const;
 	private:
 		std::string serverName;
 		std::string root;
@@ -58,6 +53,7 @@ class Request {
 		std::string method;
 		std::string body;
 		std::vector<location> loc;
+		
 		std::string req_uri;
 		std::string query_str;
 		std::string uri_no_query;

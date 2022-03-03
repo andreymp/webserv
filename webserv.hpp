@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/23 17:22:26 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 16:29:12 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <iostream>
 # include <string>
 # include <cstring>
+# include <cstdlib>
 # include <limits>
 # include <map>
 # include <sys/socket.h>
@@ -26,10 +27,15 @@
 # include <poll.h>
 # include <sys/time.h>
 # include <sys/select.h>
+# include <sys/socket.h>
+# include <sys/types.h>
 # include "cnf/Config.hpp"
 # include "server/Server.hpp"
 # include "request/Request.hpp"
 # include "server_handler/ServerHandler.hpp"
+
+# define END "\r\n\r\n"
+# define CHUNK "Transfer-Encoding: chunked"
 
 struct location {
 	std::string path;
