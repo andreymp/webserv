@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: heveline <heveline@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/22 14:30:38 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/02 18:26:47 by heveline         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,24 +30,42 @@ class Request {
 		void setIndex(std::string const & _file);
 		void setMethods(std::vector<std::string> & methods);
 		void setLocation(std::vector<location> const & locale);
+		void setMethod(std::string const & _method);
+		void setBody(std::string const & _body);
+		void setAutoindex(bool flag);
 		
 		unsigned int getHost() const;
+		std::string const & getMethod() const ; 
 		int getPort() const;
 		int getClinetBodySize() const;
 		std::string const & getServerName() const;
 		std::string const & getRoot() const;
+		std::string const & getBody() const;
 		std::string const & getIndex() const;
 		std::vector<std::string> const & getMethods() const;
 		std::vector<location> const & getLocation() const;
+		bool getAutoindex() const;
+		const std::string &getUriNoQuery() const;
+		void proccessUri(void);
+		unsigned long getContentLength() const;
+		const std::string &getRequestUri() const;
+		const std::string &getQueryString() const;
 	private:
-		unsigned int host;
-		int port;
-		int client_body_size;
 		std::string serverName;
 		std::string root;
 		std::string index;
 		std::vector<std::string> methods;
+		std::string method;
+		std::string body;
 		std::vector<location> loc;
+		std::string req_uri;
+		std::string query_str;
+		std::string uri_no_query;
+		unsigned long content_length;
+		unsigned int host;
+		int port;
+		int client_body_size;
+		bool autoindex;
 };
 
 #endif
