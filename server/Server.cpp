@@ -33,33 +33,39 @@ int Server::makeNonBlocking() {
 		std::cerr << "Accept failure" << std::endl;
 		throw Server::ServerException();
 	}
-	else if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
-		throw Server::ServerException();
+	// else if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
+	// 	throw Server::ServerException();
 	messages.insert(std::make_pair(socket_fd, std::string("")));
 	return socket_fd;
 }
 
 #define DEFUALT_SIZE 65536
 
-int Server::recieve(int socket_fd) {
+int Server::recieve(int socket_fd) 
+{
 	char buffer[DEFUALT_SIZE + 1];
 	int ret = recv(socket_fd, buffer, DEFUALT_SIZE, 0);
-	if (ret == -1) {
+	if (ret == -1) 
+	{
 		closeServer(socket_fd);
 		std::cout << "Error while reading" << std::endl;
 		return ret;
 	}
-	if (!ret) {
+	if (!ret) 
+	{
 		closeServer(socket_fd);
 		std::cout << "Connection closed by client" << std::endl;
 		return ret;
 	}
 	messages[socket_fd].append(buffer);
-	if (messages[socket_fd].find(END) != std::string::npos) {
-		if (messages[socket_fd].find("Content-Length: ") == std::string::npos) {
+	if (messages[socket_fd].find(END) != std::string::npos) 
+	{
+		if (messages[socket_fd].find("Content-Length: ") == std::string::npos) 
+		{
 			if (messages[socket_fd].find("Transfer-Encoding: chunked") == std::string::npos)
 				return 0;
-			else {
+			else 
+			{
 				std::size_t j = messages[socket_fd].find("0\r\n\r\n");
 				return j != std::string::npos && j + 5 == messages[socket_fd].size() ? 0 : 1;
 			}
@@ -111,8 +117,11 @@ void Server::recieveHandler(int socket_fd) {
 			requestForResponse.setMethod("I am the best");
 		requestForResponse.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
 		std::cout << requestForResponse.getMethod();
-		Response response;
-		response.call(requestForResponse);
+		char *hello = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 21\n\nThis is my first page";
+		write(socket_fd , hello , std::strlen(hello));
+
+		// Response response;
+		// response.call(requestForResponse);
 		messages.erase(socket_fd);
 		std::cout << messages[socket_fd] << std::endl;
 	}

@@ -72,12 +72,12 @@ void			Response::call(Request & request)
 {							
     std::pair<int, std::string> arr[] =
     {
-        std::make_pair(400,"/../pages/default_error_pages/400.html"),
-        std::make_pair(401,"/../pages/default_error_pages/401.html"),
-        std::make_pair(403,"/../pages/default_error_pages/403.html"),
-        std::make_pair(404,"/../pages/default_error_pages/404.html"),
-        std::make_pair(500,"/../pages/default_error_pages/500.html"),
-        std::make_pair(503,"/../pages/default_error_pages/503.html"),
+        std::make_pair(400,"pages/default_error_pages/400.html"),
+        std::make_pair(401,"pages/default_error_pages/401.html"),
+        std::make_pair(403,"pages/default_error_pages/403.html"),
+        std::make_pair(404,"pages/default_error_pages/404.html"),
+        std::make_pair(500,"pages/default_error_pages/500.html"),
+        std::make_pair(503,"pages/default_error_pages/503.html"),
     };
     int n = sizeof(arr) / sizeof(arr[0]);
     std::map<int, std::string> m(arr, arr + n);
@@ -154,8 +154,8 @@ void			Response::getMethod(Request & request)
 		_code = readContent();
 	else
 		_response = this->readHtml(_errorMap[_code]);
-	if (_code == 500)
-		_response = this->readHtml(_errorMap[_code]);
+	// if (_code == 500)
+	// 	_response = this->readHtml(_errorMap[_code]);
 
 	std::string language = "en-us";
 	std::string content_location = "/post_body";
