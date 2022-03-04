@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 12:53:24 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 17:51:53 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ CGIHandler & CGIHandler::operator=(const CGIHandler & other) {
 	return *this;
 }
 CGIHandler::~CGIHandler() {}
+const char * CGIHandler::CGIHandlerException::what() const throw() { return "CGIHandler exception occured!"; }
 
 char ** CGIHandler::getEnv() const {
 	char **env = new char* [envp.size() + 1];
@@ -32,6 +33,7 @@ char ** CGIHandler::getEnv() const {
 		std::string tmp = it->first + '=' + it->second;
 		std::strcpy(env[j], tmp.c_str());
 	}
+	env[envp.size()] = nullptr;
 	return env;
 }
 
@@ -55,4 +57,55 @@ void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("SERVER_PORT", std::to_string(request.getPort())));
 	envp.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
 	envp.insert(std::make_pair("SERVER_SOFTWARE", "webserv/1.0"));
+}
+
+void CGIHandler::closeFunction(int in, int out, FILE * fin, FILE * fout, int fds[], char ** env) {
+	dup2(in, STDIN_FILENO);
+	dup2(out, STDOUT_FILENO);
+	fclose(fin);
+	fclose(fout);
+	close(fds[0]);
+	close(fds[1]);
+	close(in);
+	close(out);
+	for (int i = 0; i < envp.size(); ++i)
+		delete [] env[i];
+	delete [] env;
+}
+
+std::string CGIHandler::exec(const char * filename) {
+	char ** env = getEnv();
+	int in = dup(STDIN_FILENO);
+	int out = dup(STDOUT_FILENO);
+	FILE * fin = tmpfile();
+	FILE * fout = tmpfile();
+	int fds[2] = {fileno(fin), fileno(fout)};
+	pid_t pid = fork();
+	std::string res = "";
+	
+	if (pid == -1) {
+		std::cerr << "Fork failure" << std::endl;
+		return SERVER_ERROR;
+	}
+	write(fds[0], body.c_str(), body.size());
+	lseek(fds[0], 0, SEEK_SET);
+	if (!pid) {
+		dup2(fds[0], STDIN_FILENO);
+		dup2(fds[1], STDOUT_FILENO);
+		execve(filename, nullptr, env);
+		std::cerr << "Execve failure" << std::endl;
+		write(fds[1], SERVER_ERROR, std::strlen(SERVER_ERROR));
+		closeFunction(in, out, fin, fout, fds, env);
+		exit(EXIT_FAILURE);
+	} else {
+		int ret;
+		
+		waitpid(-1, nullptr, 0);
+		lseek(fds[1], 0, SEEK_SET);
+		char buff[DEFUALT_SIZE + 1] = {0};
+		while ((ret = read(fds[1], buff, DEFUALT_SIZE)) > 0)
+			res += buff;
+		closeFunction(in, out, fin, fout, fds, env);
+	}
+	return res;
 }

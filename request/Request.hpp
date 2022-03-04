@@ -6,15 +6,14 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 17:41:41 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 18:02:19 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
-# include "../cnf/Config.hpp"
-# include <vector>
+# include "../webserv.hpp"
 
 class Request {
 	public:

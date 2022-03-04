@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/03 18:28:11 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 18:03:01 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <cstdlib>
 # include <limits>
 # include <map>
+# include <vector>
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <unistd.h>
@@ -26,6 +27,7 @@
 # include <cstdlib>
 # include <cstddef>
 # include <csignal>
+# include <cstdio>
 # include <sys/time.h>
 # include <sys/select.h>
 # include <sys/socket.h>
@@ -38,6 +40,9 @@
 
 # define END "\r\n\r\n"
 # define CHUNK "Transfer-Encoding: chunked"
+# define SERVER_ERROR "Status: 500\r\n\r\n"
+# define MAX_CONNECTIONS 1000
+# define DEFUALT_SIZE 65536
 
 struct location {
 	std::string path;

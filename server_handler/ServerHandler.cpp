@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 14:48:17 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 18:04:22 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ const char * ServerHandler::ServerHandlerException::what() const throw() { retur
 void ServerHandler::setup() {
 	FD_ZERO(&fds);
 	for (int i = 0; i < reqArray.size(); ++i) {
-		Server tmp(reqArray[i].getHost(), reqArray[i].getPort());
+		Server tmp(reqArray[i]);
 		tmp.setup();
 		int tmpFD = tmp.getServerFd();
 		FD_SET(tmpFD, &fds);

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:53:35 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/03 18:39:20 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 16:57:14 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ class CGIHandler {
 		CGIHandler(const CGIHandler &other);
 		CGIHandler & operator=(const CGIHandler &other);
 		virtual ~CGIHandler();
-		std::string & exec();
+		std::string exec(const char * filename);
 		class CGIHandlerException : public std::exception {
 			virtual const char * what() const throw();
 		};
@@ -31,6 +31,7 @@ class CGIHandler {
 		
 		char **getEnv(void) const;
 		void prepareCgiEnv(Request & request);
+		void closeFunction(int in, int out, FILE * fin, FILE * fout, int fds[], char ** env);
 		CGIHandler();
 };
 

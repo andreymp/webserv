@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 20:26:35 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 18:10:26 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Server::Server() {}
 Server::~Server() {}
-Server::Server(unsigned int _host, int _port) : host(_host), port(_port), messages() {}
+Server::Server(Request const & _req) : host(_req.getHost()), port(_req.getPort()), req(new Request(_req)), messages() {}
 Server::Server(const Server & other) { *this = other; }
 Server & Server::operator=(const Server & other) {
 	if (this != &other) {
@@ -23,6 +23,7 @@ Server & Server::operator=(const Server & other) {
 		server_fd = other.server_fd;
 		address = other.address;
 		messages = other.messages;
+		req = other.req;
 	}
 	return *this;
 }
@@ -50,8 +51,6 @@ int Server::makeNonBlocking() {
 	messages.insert(std::make_pair(socket_fd, std::string("")));
 	return socket_fd;
 }
-
-#define DEFUALT_SIZE 65536
 
 int Server::recieve(int socket_fd) {
 	char buffer[DEFUALT_SIZE + 1];
