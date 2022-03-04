@@ -7,12 +7,14 @@ SRCS =	main.cpp \
 		request/Request.cpp \
 		server_handler/ServerHandler.cpp \
 		cgi/CGIHandler.cpp \
+		response/Response.cpp \
 
 INC	= 	cnf/Config.hpp \
 		server/Server.hpp \
 		request/Request.hpp \
 		cgi/CGIHandler.hpp \
 		server_handler/ServerHandler.hpp \
+		response/Response.hpp \
 		webserv.hpp \
 
 OBJS = $(SRCS:.cpp=.o)
@@ -30,7 +32,8 @@ $(OBJS_DIR)/%.o:		%.cpp Makefile
 									$(OBJS_DIR)/server \
 									$(OBJS_DIR)/request \
 									$(OBJS_DIR)/server_handler \
-									$(OBJS_DIR)/cgi
+									$(OBJS_DIR)/cgi \
+									$(OBJS_DIR)/response
 						$(CPP) $(CPP_FLAGS) -c $< -o $@
 
 all:			$(NAME)

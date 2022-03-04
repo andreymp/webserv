@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 20:36:55 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 13:51:53 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void ServerHandler::launch() {
 			for (int i = 0; i < fill.size(); ++i)
 				FD_SET(fill[i], &writingSet);
 			ret = select(maxFD + 1, &readingSet, &writingSet, nullptr, &timeout);
+			std::cout << "hi " + std::to_string(ret) << std::endl;
 		}
 		if (ret > 0) {
 			// Sending
