@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 21:10:34 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/04 18:23:18 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,15 @@
 # include <cstdlib>
 # include <limits>
 # include <map>
+# include <vector>
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include <cstdlib>
-# include <poll.h>
+# include <cstddef>
+# include <csignal>
+# include <cstdio>
 # include <sys/time.h>
 # include <sys/select.h>
 # include <sys/socket.h>
@@ -32,11 +35,15 @@
 # include "cnf/Config.hpp"
 # include "server/Server.hpp"
 # include "request/Request.hpp"
-# include "response/Response.hpp"
 # include "server_handler/ServerHandler.hpp"
+// # include "cgi/CGIHandler.hpp"
+# include "response/Response.hpp"
 
 # define END "\r\n\r\n"
 # define CHUNK "Transfer-Encoding: chunked"
+# define SERVER_ERROR "Status: 500\r\n\r\n"
+# define MAX_CONNECTIONS 1000
+# define DEFUALT_SIZE 65536
 
 struct location {
 	std::string path;

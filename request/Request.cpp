@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 17:59:33 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/04 18:58:17 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../webserv.hpp"
 
-Request::Request() : host(0), port(0), client_body_size(100), serverName(""), root(""), index(""), methods(3), loc(10), autoindex(false) {}
+Request::Request() : host(0), port(0), client_body_size(100), serverName(""), root(""), index(""), methods(3), loc(10), autoindex(false), method(""), body("") {}
 Request::~Request() {}
-Request::Request(const Request & other) { *this = other; }
+Request::Request(const Request & other) : host(other.host), port(other.port), client_body_size(other.client_body_size), 
+	serverName(other.serverName), root(other.root), index(other.index), methods(other.methods), loc(other.loc), autoindex(other.autoindex),
+	body(other.body) {}
 Request & Request::operator=(const Request & other) {
 	if (this != &other) {
 		host = other.host;

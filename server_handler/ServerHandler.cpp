@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/03 23:58:05 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/04 18:21:04 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void ServerHandler::setup()
 	FD_ZERO(&fds);
 	for (int i = 0; i < reqArray.size(); ++i) 
 	{
-		Server tmp(reqArray[i].getHost(), reqArray[i].getPort());
+		Server tmp(reqArray[i]);
 		tmp.setup();
 		int tmpFD = tmp.getServerFd();
 		FD_SET(tmpFD, &fds);
@@ -75,7 +75,7 @@ void ServerHandler::launch()
 			for (int i = 0; i < fill.size(); ++i)
 				FD_SET(fill[i], &writingSet);
 			ret = select(maxFD + 1, &readingSet, &writingSet, NULL, NULL);
-			std::cout << "ret:" << ret << std::endl;
+			// std::cout << "ret:" << ret << std::endl;
 		}
 		// std::cout << servers.size() << std::endl;
 		if (ret > 0) 
@@ -83,7 +83,7 @@ void ServerHandler::launch()
 			// Sending
 			for (int i = 0; i < fill.size() && ret; ++i) 
 			{
-				std::cout << "s" << std::endl;
+				// std::cout << "s" << std::endl;
 				std::vector<int>::iterator it = fill.begin() + i;
 				if (FD_ISSET(fill.at(i), &writingSet)) 
 				{
@@ -107,7 +107,7 @@ void ServerHandler::launch()
 			// Recieving
 			for (std::map<int, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++) 
 			{
-				std::cout << "r" << std::endl;
+				// std::cout << "r" << std::endl;
 				if (FD_ISSET(it->first, &readingSet)) 
 				{
 					ret = it->second->recieve(it->first);
@@ -130,13 +130,13 @@ void ServerHandler::launch()
 			// Accepting sockets
 			for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end() && ret; ++it)
 			{
-				std::cout << "a" << std::endl;
+				// std::cout << "a" << std::endl;
 				if (FD_ISSET(it->first, &readingSet)) 
 				{
 					int tmpSocket;
 					if ((tmpSocket = it->second.makeNonBlocking()) >= 0) 
 					{
-						FD_SET(tmpSocket, &readingSet);
+						FD_SET(tmpSocket, &fds);
 						sockets.insert(std::make_pair(tmpSocket, &it->second));
 						if (tmpSocket > maxFD)
 							maxFD = tmpSocket;

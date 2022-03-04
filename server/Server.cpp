@@ -2,7 +2,7 @@
 
 Server::Server() {}
 Server::~Server() {}
-Server::Server(unsigned int _host, int _port) : host(_host), port(_port), messages() {}
+Server::Server(Request const & _req) : host(_req.getHost()), port(_req.getPort()), req(_req), messages() {}
 Server::Server(const Server & other) { *this = other; }
 Server & Server::operator=(const Server & other) {
 	if (this != &other) {
@@ -11,6 +11,7 @@ Server & Server::operator=(const Server & other) {
 		server_fd = other.server_fd;
 		address = other.address;
 		messages = other.messages;
+		req = other.req;
 	}
 	return *this;
 }
@@ -105,25 +106,35 @@ void Server::recieveHandler(int socket_fd) {
 	if (chunk != std::string::npos && chunk < messages[socket_fd].find(END))
 		handleChunk(socket_fd);
 	std::cout << messages[socket_fd] << std::endl;
-	if (messages[socket_fd] != "") {
-		Request requestForResponse;
+	if (messages[socket_fd] != "") 
+	{
+		// this->req
+		// Request requestForResponse;
 		if (messages[socket_fd].find("GET") == 0)
-			requestForResponse.setMethod("GET");
+			req.setMethod("GET");
 		else if (messages[socket_fd].find("POST") == 0)
-			requestForResponse.setMethod("POST");
+			req.setMethod("POST");
 		else if (messages[socket_fd].find("DELETE") == 0)
-			requestForResponse.setMethod("DELETE");
+			req.setMethod("DELETE");
 		else 
-			requestForResponse.setMethod("I am the best");
-		requestForResponse.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
-		std::cout << requestForResponse.getMethod();
-		char *hello = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 21\n\nThis is my first page";
-		write(socket_fd , hello , std::strlen(hello));
-
-		// Response response;
-		// response.call(requestForResponse);
+			req.setMethod("I am the best");
+		req.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
+		// std::cout << req.getMethod() << std::endl;
+		// std::cout << req.getMethods()[0] << std::endl;
+		// std::cout << requestForResponse.getMethod();
+		// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 21\n\nThis is my first page";
+		// write(socket_fd , hello , std::strlen(hello));
+		// this->
+		// Request requestForResponse(*this->req);
+		Response response;
+		response.call(req);
+		// std::cout << response.getResponse() << std::endl;
+		// write(socket_fd , response.getResponse() , std::strlen(response.getResponse()));
 		messages.erase(socket_fd);
-		std::cout << messages[socket_fd] << std::endl;
+		
+		messages.insert(std::make_pair(socket_fd, response.getResponse()));
+		// std::cout << messages[socket_fd] << std::endl;
+		// _requests.insert(std::make_pair(socket, response.getResponse()));
 	}
 }
 

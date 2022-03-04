@@ -69,7 +69,7 @@ std::map<std::string, void (Response::*)(Request &)> Response::_method = Respons
 вернув заголовок Retry-After
   */
 void			Response::call(Request & request)
-{							
+{
     std::pair<int, std::string> arr[] =
     {
         std::make_pair(400,"pages/default_error_pages/400.html"),
@@ -158,8 +158,8 @@ void			Response::getMethod(Request & request)
 	// 	_response = this->readHtml(_errorMap[_code]);
 
 	std::string language = "en-us";
-	std::string content_location = "/post_body";
-	std::string ContentLocation = "/";
+	// std::string content_location = "/post_body";
+	std::string ContentLocation = "./pages";
 	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, language) + "\r\n" + _response;
 }
 
@@ -286,7 +286,8 @@ int				Response::readContent(void)
 
 		file.close();
 	}
-	else if (_isAutoIndex) {
+	else if (_isAutoIndex) 
+	{
 		buffer << this -> getPage_autoindex(_path.c_str(),\
 			std::to_string(_host), _port);
 		_response = buffer.str();

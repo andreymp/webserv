@@ -81,6 +81,7 @@
         "codecvt": "cpp",
         "iomanip": "cpp",
         "stack": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "csignal": "cpp"
     }
 }
