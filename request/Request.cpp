@@ -6,15 +6,17 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 18:05:22 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 18:54:59 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../webserv.hpp"
 
-Request::Request() : host(0), port(0), client_body_size(100), serverName(""), root(""), index(""), methods(3), loc(10), autoindex(false) {}
+Request::Request() : host(0), port(0), client_body_size(100), serverName(""), root(""), index(""), methods(3), loc(10), autoindex(false), method(""), body("") {}
 Request::~Request() {}
-Request::Request(const Request & other) { *this = other; }
+Request::Request(const Request & other) : host(other.host), port(other.port), client_body_size(other.client_body_size), 
+	serverName(other.serverName), root(other.root), index(other.index), methods(other.methods), loc(other.loc), autoindex(other.autoindex),
+	body(other.body) { *this = other; }
 Request & Request::operator=(const Request & other) {
 	if (this != &other) {
 		host = other.host;
