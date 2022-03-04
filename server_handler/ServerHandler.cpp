@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 13:51:53 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 14:48:17 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,19 +61,20 @@ void ServerHandler::launch() {
 			for (int i = 0; i < fill.size(); ++i)
 				FD_SET(fill[i], &writingSet);
 			ret = select(maxFD + 1, &readingSet, &writingSet, nullptr, &timeout);
-			std::cout << "hi " + std::to_string(ret) << std::endl;
+			//std::cout << "hi " + std::to_string(ret) << std::endl;
 		}
 		if (ret > 0) {
 			// Sending
 			for (int i = 0; i < fill.size() && ret; ++i) {
+			//	std::cout << "in send" << std::endl;
 				std::vector<int>::iterator it = fill.begin() + i;
-				if (FD_ISSET(fill.at(i), &writingSet)) {
-					ret = sockets[fill.at(i)]->send(fill.at(i));
+				if (FD_ISSET(fill[i], &writingSet)) {
+					ret = sockets[fill[i]]->send(fill[i]);
 					if (ret == -1) {
-						FD_CLR(fill.at(i), &fds);
-						FD_CLR(fill.at(i), &readingSet);
+						FD_CLR(fill[i], &fds);
+						FD_CLR(fill[i], &readingSet);
 						fill.erase(it);	
-						sockets.erase(fill.at(i));
+						sockets.erase(fill[i]);
 					} else if (!ret)
 						fill.erase(it);
 					ret = 0;
@@ -83,6 +84,7 @@ void ServerHandler::launch() {
 			// Recieving
 			for (std::map<int, Server *>::iterator it = sockets.begin(); it != sockets.end(); ++it) {
 				if (FD_ISSET(it->first, &readingSet)) {
+					std::cout << "in recieve" << std::endl;
 					ret = it->second->recieve(it->first);
 					if (ret == -1) {
 						FD_CLR(it->first, &fds);
@@ -101,11 +103,12 @@ void ServerHandler::launch() {
 				if (FD_ISSET(it->first, &readingSet)) {
 					int tmpSocket;
 					if ((tmpSocket = it->second.makeNonBlocking()) >= 0) {
-						FD_SET(tmpSocket, &readingSet);
+						FD_SET(tmpSocket, &fds); // изменил тут
 						sockets.insert(std::make_pair(tmpSocket, &it->second));
 						if (tmpSocket > maxFD)
 							maxFD = tmpSocket;
 					}
+					// std::cout << "in accept " << sockets.size() << std::endl;
 					ret = 0;
 					break ;	
 				}
