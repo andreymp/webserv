@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 18:10:26 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 19:06:28 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Server::Server() {}
 Server::~Server() {}
-Server::Server(Request const & _req) : host(_req.getHost()), port(_req.getPort()), req(new Request(_req)), messages() {}
+Server::Server(Request const & _req) : host(_req.getHost()), port(_req.getPort()), req(_req), messages() {}
 Server::Server(const Server & other) { *this = other; }
 Server & Server::operator=(const Server & other) {
 	if (this != &other) {

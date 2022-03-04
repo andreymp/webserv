@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 17:51:45 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 18:09:41 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 19:07:56 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 # define SERVER_HPP
 
 # include "../webserv.hpp" 
-
-class Request;
+# include "../request/Request.hpp"
 
 class Server {
 	public:
@@ -41,7 +40,7 @@ class Server {
 		struct sockaddr_in address;
 		unsigned int host;
 		int port;
-		Request *req;
+		Request req;
 		std::map<int, std::string> messages;
 
 		void setAddress();

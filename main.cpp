@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:14:07 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 13:59:53 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/04 19:13:15 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
 	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
 	try {
 		std::vector<Request> requests(conf.parse());
+		// std::cout << "hi\n"; 
 		// Server server(requests[0].getHost(), requests[0].getPort());
 		// server.setup();
 		// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 21\n\nThis is my first page";
