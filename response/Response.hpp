@@ -29,15 +29,15 @@ public:
 	int				writeContent(std::string content);
 	int				fileExists(std::string path);
 	std::string		readHtml(const std::string& path);
-	std::string		getPage_autoindex(const char *path, std::string const &host, int port);
-
+	std::string         getPage_autoindex(const char *path);
 private:
 	std::string					_response;
 	std::string					_path;
+	std::string					_index;
 	int							_code;
 	std::string					_type;
 	bool						_isAutoIndex;
-	unsigned int				_host;
+	std::string					_host;
 	int							_port;
 	std::map<int, std::string>	_errorMap;
 

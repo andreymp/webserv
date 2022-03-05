@@ -58,8 +58,8 @@ std::string		ResponseHeader::writeHeader(void)
 		header += "Retry-After: " + _retryAfter + "\r\n";
 	if (_server != "")
 		header += "Server: " + _server + "\r\n";
-	if (_transferEncoding != "")
-		header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
+	// if (_transferEncoding != "")
+	// 	header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
 	if (_wwwAuthenticate != "")
 		header += "WWW-Authenticate: " + _wwwAuthenticate + "\r\n";
 	// header += "\r\n";

@@ -21,7 +21,6 @@ int main(int argc, char **argv) {
 	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
 	try {
 		std::vector<Request> requests(conf.parse());
-
 		// Server server(requests[0].getHost(), requests[0].getPort());
 		// server.setup();
 		// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 21\n\nThis is my first page";

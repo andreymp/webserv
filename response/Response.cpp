@@ -13,17 +13,16 @@
 int		pathIsFile(const std::string& path)
 {
 	/*
-int stat(const char *restrict path, struct stat *restrict buf);
+		int stat(const char *restrict path, struct stat *restrict buf);
 
-ОПИСАНИЕ
+		ОПИСАНИЕ
 
-Функция stat() должна получить информацию об указанном файле и записать ее в область, на которую указывает 
-аргумент buf. Аргумент пути указывает на путь, 
-именующий файл. Разрешение на чтение, запись или выполнение указанного файла не требуется.
+		Функция stat() должна получить информацию об указанном файле и записать ее в область, на которую указывает 
+		аргумент buf. Аргумент пути указывает на путь, 
+		именующий файл. Разрешение на чтение, запись или выполнение указанного файла не требуется.
 
-Upon successful completion, 0 shall be returned. Otherwise, -1 shall be 
-returned and errno set to indicate the error.
-
+		Upon successful completion, 0 shall be returned. Otherwise, -1 shall be 
+		returned and errno set to indicate the error.
 	*/
 
 	struct stat s;
@@ -70,6 +69,9 @@ std::map<std::string, void (Response::*)(Request &)> Response::_method = Respons
   */
 void			Response::call(Request & request)
 {
+	// std::cout << request.getAutoindex() << std::endl;
+	// std::cout << request.getRoot() << std::endl;
+	// std::cout << request.getIndex() << std::endl;
     std::pair<int, std::string> arr[] =
     {
         std::make_pair(400,"pages/default_error_pages/400.html"),
@@ -83,33 +85,17 @@ void			Response::call(Request & request)
     std::map<int, std::string> m(arr, arr + n);
 	_errorMap = m; // код -> путь до файла
 
-	_isAutoIndex = request.getAutoindex();
-	_host = request.getHost();
+	_isAutoIndex = 1;//request.getAutoindex();
+	_host = "localhost";//request.getHost();
 	_port = request.getPort();
 	_code = 200;//request.getRet();
 	_path = request.getRoot();
+	_index = request.getIndex();
 	std::vector<std::string> vec = request.getMethods();
 	if (std::find(vec.begin(), vec.end(), request.getMethod()) == vec.end())
 		_code = 405;
 	else if (request.getClinetBodySize() < request.getBody().size())
 		_code = 413;
-
-/*
-405 Method Not Allowed — указанный клиентом метод нельзя применить к текущему ресурсу. 
-В ответе сервер должен указать доступные методы в заголовке Allow, разделив их запятой.
- Эту ошибку сервер должен возвращать, если метод ему известен, но он не применим именно
-  к указанному в запросе ресурсу, если же указанный метод не применим на всём сервере, 
-  то клиенту нужно вернуть код 501 (Not Implemented). Появился в HTTP/1.1.
-  */
-
-/* 
- 413 Payload Too Large — возвращается в случае, если сервер отказывается обработать
-  запрос по причине слишком большого размера тела запроса. Сервер может закрыть соединение, 
-  чтобы прекратить дальнейшую передачу запроса. Если проблема временная, то рекомендуется
-   в ответ сервера включить заголовок Retry-After с указанием времени, по истечении которого
-    можно повторить аналогичный запрос. Появился в HTTP/1.1. Ранее назывался 
-	«Request Entity Too Large».
-*/
 
 	if (_code == 405 || _code == 413)
 	{
@@ -154,11 +140,8 @@ void			Response::getMethod(Request & request)
 		_code = readContent();
 	else
 		_response = this->readHtml(_errorMap[_code]);
-	// if (_code == 500)
-	// 	_response = this->readHtml(_errorMap[_code]);
 
 	std::string language = "en-us";
-	// std::string content_location = "/post_body";
 	std::string ContentLocation = "./pages";
 	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, language) + "\r\n" + _response;
 }
@@ -227,7 +210,7 @@ void			Response::getMethod(Request & request)
 // Utils
 
 
-std::string         Response::getPage_autoindex(const char *path, std::string const &host, int port) {
+std::string         Response::getPage_autoindex(const char *path) {
     std::string dirName(path);
     DIR *dir = opendir(path);
     std::string page =\
@@ -248,8 +231,13 @@ std::string         Response::getPage_autoindex(const char *path, std::string co
         dirName = "/" + dirName;
     for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) 
     {
-        std::string a = "\t\t<p><a href=\"http://" + host + ": " + " " \
-        + std::to_string(port) + " " + dirName + "/" + std::string(dirEntry->d_name) + "\">" + std::string(dirEntry->d_name) + "</a></p>\n";
+        std::string a = "\t\t<p><a href=http://" + \
+
+		 _host + ":" + std::to_string(_port) + dirName \
+		+ std::string(dirEntry->d_name) + "\">" + \
+		std::string(dirEntry->d_name) + \
+		"</a></p>\n";
+		
         page += a;
     }
     page +="\
@@ -267,8 +255,14 @@ int				Response::readContent(void)
 	std::stringstream	buffer;
 
 	_response = "";
-
-	if (pathIsFile(_path))
+	std::cout << _path << std::endl;
+	if (_isAutoIndex) 
+	{
+		buffer << this -> getPage_autoindex(_path.c_str());
+		_response = buffer.str();
+		_type = "text/html";
+	}
+	else if (pathIsFile(_path + _index))
 	{
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
@@ -285,13 +279,6 @@ int				Response::readContent(void)
 		_response = buffer.str();
 
 		file.close();
-	}
-	else if (_isAutoIndex) 
-	{
-		buffer << this -> getPage_autoindex(_path.c_str(),\
-			std::to_string(_host), _port);
-		_response = buffer.str();
-		_type = "text/html";
 	}
 	else
 	{

@@ -119,22 +119,12 @@ void Server::recieveHandler(int socket_fd) {
 		else 
 			req.setMethod("I am the best");
 		req.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
-		// std::cout << req.getMethod() << std::endl;
-		// std::cout << req.getMethods()[0] << std::endl;
-		// std::cout << requestForResponse.getMethod();
-		// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 21\n\nThis is my first page";
-		// write(socket_fd , hello , std::strlen(hello));
-		// this->
-		// Request requestForResponse(*this->req);
 		Response response;
 		response.call(req);
 		// std::cout << response.getResponse() << std::endl;
-		// write(socket_fd , response.getResponse() , std::strlen(response.getResponse()));
 		messages.erase(socket_fd);
-		
 		messages.insert(std::make_pair(socket_fd, response.getResponse()));
 		// std::cout << messages[socket_fd] << std::endl;
-		// _requests.insert(std::make_pair(socket, response.getResponse()));
 	}
 }
 
