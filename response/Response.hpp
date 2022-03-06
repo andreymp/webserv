@@ -29,7 +29,8 @@ public:
 	int				writeContent(std::string content);
 	int				fileExists(std::string path);
 	std::string		readHtml(const std::string& path);
-	std::string         getPage_autoindex(const char *path);
+	std::string     getPage_autoindex();
+	
 private:
 	std::string					_response;
 	std::string					_path;

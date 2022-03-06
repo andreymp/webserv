@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 19:14:52 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/06 02:41:22 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Request {
 		std::vector<std::string> const & getMethods() const;
 		std::vector<location> const & getLocation() const;
 		bool getAutoindex() const;
+		std::string _path;
 	private:
 		unsigned int host;
 		int port;

@@ -85,12 +85,12 @@ void			Response::call(Request & request)
     std::map<int, std::string> m(arr, arr + n);
 	_errorMap = m; // код -> путь до файла
 
-	_isAutoIndex = 1;//request.getAutoindex();
+	_isAutoIndex = 0;//request.getAutoindex();
 	_host = "localhost";//request.getHost();
 	_port = request.getPort();
 	_code = 200;//request.getRet();
-	_path = request.getRoot();
-	_index = request.getIndex();
+	_path = request._path;
+	_index = "index.html"; //тут должен быть индекс!!!
 	std::vector<std::string> vec = request.getMethods();
 	if (std::find(vec.begin(), vec.end(), request.getMethod()) == vec.end())
 		_code = 405;
@@ -210,9 +210,17 @@ void			Response::getMethod(Request & request)
 // Utils
 
 
-std::string         Response::getPage_autoindex(const char *path) {
-    std::string dirName(path);
-    DIR *dir = opendir(path);
+std::string         Response::getPage_autoindex() 
+{
+	std::string path(_path);
+
+	std::string dirName = "";
+	if (path != "pages/") //тут должен быть рут
+    	dirName = path.substr(path.find("pages/") + 6, path.size());
+
+	std::cout << "{PATH}" << dirName << std::endl;
+	char* ppath = const_cast<char*>(path.c_str());
+    DIR *dir = opendir(ppath);
     std::string page =\
     "<!DOCTYPE html>\n\
     <html>\n\
@@ -227,15 +235,13 @@ std::string         Response::getPage_autoindex(const char *path) {
         std::cerr << "Error: could not open [" << path << "]" << std::endl;
         return "";
     }
-    if (dirName[0] != '/')
-        dirName = "/" + dirName;
     for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) 
     {
-        std::string a = "\t\t<p><a href=http://" + \
+        std::string a = "\t\t<p><a href=\"http://" + \
 
-		 _host + ":" + std::to_string(_port) + dirName \
-		+ std::string(dirEntry->d_name) + "\">" + \
-		std::string(dirEntry->d_name) + \
+		 _host + ":" + std::to_string(_port) + dirName + "/" + \
+		 	std::string(dirEntry->d_name) + "\">" + \
+			std::string(dirEntry->d_name) + \
 		"</a></p>\n";
 		
         page += a;
@@ -253,16 +259,17 @@ int				Response::readContent(void)
 {
 	std::ifstream		file;
 	std::stringstream	buffer;
+		_type = "text/html"; // когда надо а когда нет???
 
 	_response = "";
-	std::cout << _path << std::endl;
-	if (_isAutoIndex) 
+	std::cout << "{PATH}" << _path << _index << std::endl;
+	if (_isAutoIndex && !pathIsFile(_path))
 	{
-		buffer << this -> getPage_autoindex(_path.c_str());
+		buffer << this -> getPage_autoindex();
 		_response = buffer.str();
 		_type = "text/html";
 	}
-	else if (pathIsFile(_path + _index))
+	else if (pathIsFile(_path))
 	{
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
@@ -280,6 +287,25 @@ int				Response::readContent(void)
 
 		file.close();
 	}
+	else if (pathIsFile(_path + _index))
+	{
+		std::string file_with_index = _path + _index;
+		std::cout << _path + _index << std::endl;
+		file.open(file_with_index.c_str(), std::ifstream::in);
+		if ((file).is_open() == false)
+		{
+			/*
+			"Запрещено". У клиента нет прав доступа к содержимому,
+			 поэтому сервер отказывается дать надлежащий ответ.
+			 */ 	
+			_response = this->readHtml(_errorMap[403]);
+			return (403);
+		}
+		buffer << file.rdbuf();
+		_response = buffer.str();
+	
+		file.close();
+	}
 	else
 	{
 		/*
@@ -293,39 +319,39 @@ int				Response::readContent(void)
 	return (200);
 }
 
-int				Response::writeContent(std::string content)
-{
-	std::ofstream	file;
+// int				Response::writeContent(std::string content)
+// {
+// 	std::ofstream	file;
 
-/* "Нет содержимого". Нет содержимого для ответа на запрос, 
-но заголовки ответа, которые могут быть полезны, присылаются. Клиент может использовать 
-их для обновления кешированных заголовков полученных ранее для этого ресурса.	
-*/
-	if (pathIsFile(_path))
-	{
-		file.open(_path.c_str());
-		file << content;
-		file.close();
-		return (204);
-	}
-	else
-	{
-		/*
-		"Запрещено". У клиента 
-		нет прав доступа к содержимому, поэтому сервер отказывается дать надлежащий ответ. 	
-		*/
-		file.open(_path.c_str(), std::ofstream::out | std::ofstream::trunc);
-		if (file.is_open() == false)
-			return (403);
+// /* "Нет содержимого". Нет содержимого для ответа на запрос, 
+// но заголовки ответа, которые могут быть полезны, присылаются. Клиент может использовать 
+// их для обновления кешированных заголовков полученных ранее для этого ресурса.	
+// */
+// 	if (pathIsFile(_path))
+// 	{
+// 		file.open(_path.c_str());
+// 		file << content;
+// 		file.close();
+// 		return (204);
+// 	}
+// 	else
+// 	{
+// 		/*
+// 		"Запрещено". У клиента 
+// 		нет прав доступа к содержимому, поэтому сервер отказывается дать надлежащий ответ. 	
+// 		*/
+// 		file.open(_path.c_str(), std::ofstream::out | std::ofstream::trunc);
+// 		if (file.is_open() == false)
+// 			return (403);
 
-/* "Создано". Запрос успешно выполнен и в результате
- был создан ресурс. Этот код обычно присылается в ответ на запрос PUT "ПОМЕСТИТЬ".
- */
-		file << content;
-		file.close();
-		return (201);
-	}
-}
+// 		/* "Создано". Запрос успешно выполнен и в результате
+// 		был создан ресурс. Этот код обычно присылается в ответ на запрос PUT "ПОМЕСТИТЬ".
+// 		*/
+// 		file << content;
+// 		file.close();
+// 		return (201);
+// 	}
+// }
 
 std::string		Response::readHtml(const std::string& path)
 {

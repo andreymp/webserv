@@ -82,6 +82,7 @@
         "iomanip": "cpp",
         "stack": "cpp",
         "fstream": "cpp",
-        "csignal": "cpp"
+        "csignal": "cpp",
+        "filesystem": "cpp"
     }
 }

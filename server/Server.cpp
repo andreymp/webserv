@@ -24,6 +24,7 @@ void Server::setAddress() {
 	std::memset((char *) &address, 0, sizeof(address));
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = htonl(host);
+	// std::cout <<  "PORT SERVER:" << port << std::endl;
 	address.sin_port = htons(port);
 }
 
@@ -108,8 +109,6 @@ void Server::recieveHandler(int socket_fd) {
 	std::cout << messages[socket_fd] << std::endl;
 	if (messages[socket_fd] != "") 
 	{
-		// this->req
-		// Request requestForResponse;
 		if (messages[socket_fd].find("GET") == 0)
 			req.setMethod("GET");
 		else if (messages[socket_fd].find("POST") == 0)
@@ -119,9 +118,17 @@ void Server::recieveHandler(int socket_fd) {
 		else 
 			req.setMethod("I am the best");
 		req.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
+		int pos = messages[socket_fd].find(' ');
+		int pos_end = messages[socket_fd].find(' ', pos + 1);
+		// std::cout << pos << std::endl << pos_end << std::endl;
 		Response response;
+		std::string buf = messages[socket_fd].substr(pos + 2, pos_end - pos - 2);
+		// std::cout << "SUBSTR:" << buf << std::endl;
+		req._path = req.getRoot() + buf;
+		// std::cout << "PORT" << this -> port << std::endl;
+		// req.setPort(this -> port);
+		// std::cout << "ROOT:" << req.getRoot() << std::endl;
 		response.call(req);
-		// std::cout << response.getResponse() << std::endl;
 		messages.erase(socket_fd);
 		messages.insert(std::make_pair(socket_fd, response.getResponse()));
 		// std::cout << messages[socket_fd] << std::endl;
