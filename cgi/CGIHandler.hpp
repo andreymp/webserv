@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:53:35 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 16:57:14 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 20:36:27 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class CGIHandler {
 	private:
 		std::map<std::string, std::string>	envp;
 		std::string body;
+		Request request;
 		
 		char **getEnv(void) const;
 		void prepareCgiEnv(Request & request);

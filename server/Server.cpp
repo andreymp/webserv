@@ -6,7 +6,11 @@
 /*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2022/03/07 22:58:46 by celys            ###   ########.fr       */
+=======
+/*   Updated: 2022/03/07 19:52:07 by jobject          ###   ########.fr       */
+>>>>>>> bcdb76db7a9b79c64d79d4c04567451ade48f73e
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +160,6 @@ void Server::recieveHandler(int socket_fd) {
 		response.call(request);
 		messages.erase(socket_fd);
 		messages.insert(std::make_pair(socket_fd, response.getResponse()));
-		// std::cout << messages[socket_fd] << std::endl;
 	}
 }
 
