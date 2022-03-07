@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 18:23:33 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 19:11:01 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@ void			Response::call(Request & request)
         std::make_pair(401,"pages/default_error_pages/401.html"),
         std::make_pair(403,"pages/default_error_pages/403.html"),
         std::make_pair(404,"pages/default_error_pages/404.html"),
+		std::make_pair(405,"pages/default_error_pages/405.html"),
         std::make_pair(500,"pages/default_error_pages/500.html"),
         std::make_pair(503,"pages/default_error_pages/503.html"),
     };

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 17:51:53 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 21:32:10 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 CGIHandler::CGIHandler() {}
 CGIHandler::CGIHandler(const CGIHandler &other) { *this = other; }
-CGIHandler::CGIHandler(Request & request) : body(request.getBody()) { prepareCgiEnv(request); }
+CGIHandler::CGIHandler(Request & request) : body(request.getBody()), request(request) { prepareCgiEnv(request); }
 CGIHandler & CGIHandler::operator=(const CGIHandler & other) {
 	if (this != &other) {
 		envp = other.envp;
@@ -39,24 +39,22 @@ char ** CGIHandler::getEnv() const {
 
 // "" means to add to request
 void CGIHandler::prepareCgiEnv(Request & request) {
-	envp.insert(std::make_pair("AUTH_TYPE", "")); 
+	//envp.insert(std::make_pair("AUTH_TYPE", "")); 
 	envp.insert(std::make_pair("CONTENT_LENGTH", std::to_string(body.size())));
 	envp.insert(std::make_pair("REDIRECT_STATUS", "200"));
 	envp.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
-	envp.insert(std::make_pair("SCRIPT_NAME", request.getIndex()));
-	envp.insert(std::make_pair("SCRIPT_FILENAME", request.getRoot() + "/" + request.getIndex()));
+	envp.insert(std::make_pair("SCRIPT_NAME", request.getCgiPath()));
+	envp.insert(std::make_pair("SCRIPT_FILENAME", request.PATH + "/" + request.getCgiPath()));
 	envp.insert(std::make_pair("REQUEST_METHOD", request.getMethod()));
-	envp.insert(std::make_pair("PATH_INFO", request.getRoot() + "/" + request.getIndex()));
-	envp.insert(std::make_pair("PATH_TRANSLATED", request.getRoot() + "/" + request.getIndex()));
+	envp.insert(std::make_pair("PATH_INFO", request.PATH));
+	// envp.insert(std::make_pair("PATH_TRANSLATED", request.getRoot() + "/" + request.getIndex()));
 	envp.insert(std::make_pair("QUERY_STRING", ""));
 	envp.insert(std::make_pair("REMOTE_ADDR", std::to_string(request.getHost())));
-	envp.insert(std::make_pair("REMOTE_IDENT", ""));
-	envp.insert(std::make_pair("REMOTE_USER", ""));
-	envp.insert(std::make_pair("REQUEST_URI", ""));
+	envp.insert(std::make_pair("REQUEST_URI", request.PATH));
 	envp.insert(std::make_pair("SERVER_NAME", request.getServerName() == "" ? envp["REMOTE_ADDR"] : request.getServerName()));
 	envp.insert(std::make_pair("SERVER_PORT", std::to_string(request.getPort())));
 	envp.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
-	envp.insert(std::make_pair("SERVER_SOFTWARE", "webserv/1.0"));
+	envp.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));
 }
 
 void CGIHandler::closeFunction(int in, int out, FILE * fin, FILE * fout, int fds[], char ** env) {
@@ -80,22 +78,26 @@ std::string CGIHandler::exec(const char * filename) {
 	FILE * fin = tmpfile();
 	FILE * fout = tmpfile();
 	int fds[2] = {fileno(fin), fileno(fout)};
-	pid_t pid = fork();
 	std::string res = "";
 	
+	const char * path = (request.PATH + "/" + std::string(filename)).c_str();
+	std::cerr << path << std::endl;
+	write(fds[0], body.c_str(), body.size());
+	lseek(fds[0], 0, SEEK_SET);
+	pid_t pid = fork();
 	if (pid == -1) {
 		std::cerr << "Fork failure" << std::endl;
 		return SERVER_ERROR;
 	}
-	write(fds[0], body.c_str(), body.size());
-	lseek(fds[0], 0, SEEK_SET);
 	if (!pid) {
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fds[1], STDOUT_FILENO);
-		execve(filename, nullptr, env);
-		std::cerr << "Execve failure" << std::endl;
+		char * const * argv = nullptr;
+		execve(path, argv, env);
+		std::cerr << "Execve failure\n" << strerror(errno) << std::endl;
 		write(fds[1], SERVER_ERROR, std::strlen(SERVER_ERROR));
-		closeFunction(in, out, fin, fout, fds, env);
+		delete [] argv[0];
+		delete [] argv[1];
 		exit(EXIT_FAILURE);
 	} else {
 		int ret;

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 18:47:08 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 19:52:07 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,6 @@ void Server::recieveHandler(int socket_fd) {
 		response.call(request);
 		messages.erase(socket_fd);
 		messages.insert(std::make_pair(socket_fd, response.getResponse()));
-		std::cout << messages[socket_fd] << std::endl;
 	}
 }
 
