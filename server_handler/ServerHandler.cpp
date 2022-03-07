@@ -6,7 +6,7 @@
 /*   By: celys <celys@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 18:21:04 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/07 02:52:41 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ ServerHandler & ServerHandler::operator=(const ServerHandler & other) {
 		maxFD = other.maxFD;
 	}
 	return *this;
+}
+
+std::vector <int> ServerHandler::get_fd()
+{
+	std::vector <int> fds;
+	for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end(); ++it)
+		fds.push_back(it->first);
+	return (fds);
 }
 
 const char * ServerHandler::ServerHandlerException::what() const throw() { return "ServerHandler exception occured"; }
@@ -50,6 +58,14 @@ void ServerHandler::closeConnection() {
 		it->second.closeServer(it->first);
 }
 
+// int end = 0;
+// void closeServer(int signal)
+// {
+// 	(void)signal;
+// 	end = 1;
+// 	exit(0);
+// }
+
 void ServerHandler::launch() 
 {
 	//сначала должен выполниться
@@ -60,6 +76,7 @@ void ServerHandler::launch()
 	//и потом можно напечатать Response вывод в терминал
 	std::vector<int> fill;
 	std::map<int, Server *> sockets;
+	
 	while (true) {
 		std::cout << "---------------\n";
 		fd_set 			readingSet;

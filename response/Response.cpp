@@ -260,7 +260,7 @@ int				Response::readContent(void)
 	std::ifstream		file;
 	std::stringstream	buffer;
 		_type = "text/html"; // когда надо а когда нет???
-
+		_type =  "image/png"; // надо как-то различать контент !!!
 	_response = "";
 	std::cout << "{PATH}" << _path << _index << std::endl;
 	if (_isAutoIndex && !pathIsFile(_path))

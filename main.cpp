@@ -14,6 +14,18 @@ bool checkArgs(int argc, char **argv)
 	return true;
 }
 
+std::vector<int> fd;
+void endServer(int signal)
+{
+	(void)signal;
+	for (std::vector<int>::iterator it = fd.begin(); it != fd.end(); ++it)
+	{
+		close(*it);
+		std::cout << "IT:" <<  *it << std::endl;
+	}
+	exit(0);
+}
+
 int main(int argc, char **argv) 
 {
 	if (!checkArgs(argc, argv)) 
@@ -25,7 +37,9 @@ int main(int argc, char **argv)
 	try {
 		std::vector<Request> requests(conf.parse());
 		ServerHandler server(requests);
+		signal(SIGINT, endServer);
 		server.setup();
+		fd = server.get_fd();
 		server.launch();
 		server.closeConnection();
 	} 
