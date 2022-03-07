@@ -6,11 +6,12 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 13:34:45 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 18:23:33 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "../cgi/CGIHandler.hpp"
 #include "ResponseHeader.hpp"
 #include <sys/time.h>
 #include <sys/stat.h>
@@ -55,8 +56,8 @@ std::map<std::string, void (Response::*)(Request &)>	Response::initMethods()
 	std::map<std::string, void (Response::*)(Request &)> map;
 
 	map["GET"] = &Response::getMethod;
-	// map["POST"] = &Response::postMethod;
-	// map["DELETE"] = &Response::deleteMethod;
+	map["POST"] = &Response::postMethod;
+	map["DELETE"] = &Response::deleteMethod;
 	return map;
 }
 
@@ -121,28 +122,28 @@ void			Response::getMethod(Request & request)
 {
 	ResponseHeader	head;
 
-	// if (request.getCgiPass() != "")
-	// {
-	// 	CgiHandler	cgi(request);
-	// 	size_t		i = 0;
-	// 	size_t		j = _response.size() - 2;
+	if (request.getCgiPath() != "")
+	{
+		CGIHandler	cgi(request);
+		size_t		i = 0;
+		size_t		j = _response.size() - 2;
 
-	// 	_response = cgi.executeCgi(request.getCgiPass());
+		_response = cgi.exec(request.getCgiPath().c_str());
 
-	// 	while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-	// 	{
-	// 		std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
-	// 		if (str.find("Status: ") == 0)
-	// 			_code = std::atoi(str.substr(8, 3).c_str());
-	// 		else if (str.find("Content-type: ") == 0)
-	// 			_type = str.substr(14, str.size());
-	// 		i += str.size() + 2;
-	// 	}
-	// 	while (_response.find("\r\n", j) == j)
-	// 		j -= 2;
+		while (_response.find(END, i) != std::string::npos || _response.find("\r\n", i) == i)
+		{
+			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
+			if (str.find("Status: ") == 0)
+				_code = std::atoi(str.substr(8, 3).c_str());
+			else if (str.find("Content-type: ") == 0)
+				_type = str.substr(14, str.size());
+			i += str.size() + 2;
+		}
+		while (_response.find("\r\n", j) == j)
+			j -= 2;
 
-	// 	_response = _response.substr(i, j - i);
-	// }
+		_response = _response.substr(i, j - i);
+	}
 	if  (_code == 200)
 		_code = readContent();
 	else
@@ -154,61 +155,60 @@ void			Response::getMethod(Request & request)
 }
 
 
-// void			Response::postMethod(Request & request, Request & requestConf)
-// {
-	// ResponseHeader	head;
+void			Response::postMethod(Request & request)
+{
+	ResponseHeader	head;
 
-	// if (requestConf.getCgiPass() != "")
-	// {
-	// 	CgiHandler	cgi(request, requestConf);
-	// 	size_t		i = 0;
-	// 	size_t		j = _response.size() - 2;
+	if (request.getCgiPath() != "")
+	{
+		CGIHandler	cgi(request);
+		size_t		i = 0;
+		size_t		j = _response.size() - 2;
 
-	// 	_response = cgi.executeCgi(requestConf.getCgiPass());
+		_response = cgi.exec(request.getCgiPath().c_str());
 
-	// 	while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-	// 	{
-	// 		std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
-	// 		if (str.find("Status: ") == 0)
-	// 			_code = std::atoi(str.substr(8, 3).c_str());
-	// 		else if (str.find("Content-Type: ") == 0)
-	// 			_type = str.substr(14, str.size());
-	// 		i += str.size() + 2;
-	// 	}
-	// 	while (_response.find("\r\n", j) == j)
-	// 		j -= 2;
+		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
+		{
+			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
+			if (str.find("Status: ") == 0)
+				_code = std::atoi(str.substr(8, 3).c_str());
+			else if (str.find("Content-Type: ") == 0)
+				_type = str.substr(14, str.size());
+			i += str.size() + 2;
+		}
+		while (_response.find("\r\n", j) == j)
+			j -= 2;
 
-	// 	_response = _response.substr(i, j - i);
-	// }
-	// else
-	// {
-	// 	_code = 204;
-	// 	_response = "";
-	// }
-	// if (_code == 500)
-	// 	_response = this->readHtml(_errorMap[_code]);
-	// _response = head.getHeader(_response.size(), _path, _code, _type, requestConf.getContentLocation(), requestConf.getLang()) + "\r\n" + _response;
-// }
+		_response = _response.substr(i, j - i);
+	}
+	else
+	{
+		_code = 204;
+		_response = "";
+	}
+	if (_code == 500)
+		_response = this->readHtml(_errorMap[_code]);
+	//_response = head.getHeader(_response.size(), _path, _code, _type, request.getLocation(), request.getLang()) + "\r\n" + _response;
+}
 
-// void			Response::deleteMethod(Request & request, Request & requestConf)
-// {
-	// ResponseHeader	head;
-	// (void)request;
+void			Response::deleteMethod(Request & __unused request)
+{
+	ResponseHeader	head;
 
-	// _response = "";
-	// if (pathIsFile(_path))
-	// {
-	// 	if (remove(_path.c_str()) == 0)
-	// 		_code = 204;
-	// 	else
-	// 		_code = 403;
-	// }
-	// else
-	// 	_code = 404;
-	// if (_code == 403 || _code == 404)
-	// 	_response = this->readHtml(_errorMap[_code]);
-	// _response = head.getHeader(_response.size(), _path, _code, _type, requestConf.getContentLocation(), requestConf.getLang()) + "\r\n" + _response;
-// }
+	_response = "";
+	if (pathIsFile(_path))
+	{
+		if (remove(_path.c_str()) == 0)
+			_code = 204;
+		else
+			_code = 403;
+	}
+	else
+		_code = 404;
+	if (_code == 403 || _code == 404)
+		_response = this->readHtml(_errorMap[_code]);
+	//_response = head.getHeader(_response.size(), _path, _code, _type, request.getLocation(), request.getLang()) + "\r\n" + _response;
+}
 
 
 // }
@@ -225,7 +225,7 @@ std::string         Response::getPage_autoindex()
 	if (path != "pages/") //тут должен быть рут
     	dirName = path.substr(path.find("pages/") + 6, path.size());
 
-	std::cout << "{PATH}" << dirName << std::endl;
+	// std::cout << "{PATH}" << dirName << std::endl;
 	char* ppath = const_cast<char*>(path.c_str());
     DIR *dir = opendir(ppath);
     std::string page =\
@@ -269,7 +269,7 @@ int				Response::readContent(void)
 		_type = "text/html"; // когда надо а когда нет???
 
 	_response = "";
-	std::cout << "{PATH}" << _path << _index << std::endl;
+	// std::cout << "{PATH}" << _path << _index << std::endl;
 	if (_isAutoIndex && !pathIsFile(_path))
 	{
 		buffer << this -> getPage_autoindex();
@@ -281,7 +281,7 @@ int				Response::readContent(void)
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
-			/*
+			/* 
 			"Запрещено". У клиента нет прав доступа к содержимому,
 			 поэтому сервер отказывается дать надлежащий ответ.
 			 */ 	
@@ -297,7 +297,7 @@ int				Response::readContent(void)
 	else if (pathIsFile(_path + _index))
 	{
 		std::string file_with_index = _path + _index;
-		std::cout << _path + _index << std::endl;
+		// std::cout << _path + _index << std::endl;
 		file.open(file_with_index.c_str(), std::ifstream::in);
 		if ((file).is_open() == false)
 		{

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 13:08:48 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 14:56:19 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ public:
 	void			call(Request & request);
 
 	void			getMethod(Request & request);
-	// void			postMethod(Request & request);
-	// void			deleteMethod(Request & request);
+	void			postMethod(Request & request);
+	void			deleteMethod(Request & request);
 
 	int				readContent(void);
 	int				writeContent(std::string content);

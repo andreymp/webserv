@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 13:26:02 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 18:47:08 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int Server::send(int socket_fd) {
 	if (sentMessages.find(socket_fd) == sentMessages.end())
 		sentMessages.insert(std::make_pair(socket_fd, 0));
 	if (!sentMessages[socket_fd])
-		std::cout << messages[socket_fd] << std::endl;
+		std::cout << "\033[0;32m" << "SEND:" << std::endl << messages[socket_fd] << "\033[0m" <<  std::endl;
 	std::string msgToSend = messages[socket_fd].substr(sentMessages[socket_fd], DEFUALT_SIZE);
 	int ret = ::send(socket_fd, msgToSend.c_str(), msgToSend.size(), 0);
 	if (ret >= 0) {
@@ -109,23 +109,43 @@ void Server::recieveHandler(int socket_fd) {
 	std::size_t chunk = messages[socket_fd].find(CHUNK);
 	if (chunk != std::string::npos && chunk < messages[socket_fd].find(END))
 		handleChunk(socket_fd);
-	std::cout << messages[socket_fd] << std::endl;
+	std::cout << "\033[0;33m" << "RECIEVE:" << std::endl << messages[socket_fd] << "\033[0m" <<  std::endl;
 	if (messages[socket_fd] != "") {
+		Request request(req);
+		location locale;
+		std::size_t tmp = messages[socket_fd].find('/');
+		std::size_t last = tmp;
+		for (; messages[socket_fd][last] != ' ' && last < messages[socket_fd].size(); last++);
+		request.HEAD = messages[socket_fd][tmp + 1] == ' ' ? "/" : messages[socket_fd].substr(tmp, last - tmp);
+		bool inLoc = false;
+		for (std::size_t i = 0; i < req.getLocation().size(); ++i)
+			if (request.HEAD == request.getLocation()[i].path) {
+				locale = request.getLocation()[i];
+				inLoc = true;
+			}
 		if (messages[socket_fd].find("GET") == 0)
-			req.setMethod("GET");
+			request.setMethod("GET");
 		else if (messages[socket_fd].find("POST") == 0)
-			req.setMethod("POST");
+			request.setMethod("POST");
 		else if (messages[socket_fd].find("DELETE") == 0)
-			req.setMethod("DELETE");
+			request.setMethod("DELETE");
 		else 
-			req.setMethod("I am the best");
-		req.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
+			request.setMethod("I am the best");
+		request.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
 		std::size_t pos = messages[socket_fd].find(' ');
 		std::size_t pos_end = messages[socket_fd].find(' ', pos + 1);
 		Response response;
 		std::string buf = messages[socket_fd].substr(pos + 2, pos_end - pos - 2);
-		req.PATH = req.getRoot() + buf;
-		response.call(req);
+		request.PATH = req.getRoot() + buf;
+		if (inLoc) {
+			request.setMethods(locale.methods);
+			request.setRoot(locale.root == "" ? req.getRoot() : locale.root);
+			request.setIndex(locale.index == "" ? "" : "/" + locale.index);
+			request.setAutoindex(locale.autoindex);
+			request.setCgiPath(locale.cgi_path);
+			request.setClientBodySize(locale.client_body_size);
+		}
+		response.call(request);
 		messages.erase(socket_fd);
 		messages.insert(std::make_pair(socket_fd, response.getResponse()));
 		std::cout << messages[socket_fd] << std::endl;

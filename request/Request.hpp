@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 13:01:12 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 17:24:31 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class Request {
 		void setRoot(std::string const & path);
 		void setIndex(std::string const & _file);
 		void setMethods(std::vector<std::string> & methods);
+		void setCgiPath(std::string const & _path);
 		void setLocation(std::vector<location> const & locale);
 		void setMethod(std::string const & _method);
 		void setBody(std::string const & _body);
@@ -39,6 +40,7 @@ class Request {
 		int getClinetBodySize() const;
 		std::string const & getServerName() const;
 		std::string const & getRoot() const;
+		std::string const & getCgiPath() const;
 		std::string const & getBody() const;
 		std::string const & getIndex() const;
 		std::vector<std::string> const & getMethods() const;
@@ -46,6 +48,7 @@ class Request {
 		bool getAutoindex() const;
 
 		std::string PATH;
+		std::string HEAD;
 	private:
 		unsigned int host;
 		int port;
@@ -56,6 +59,7 @@ class Request {
 		std::vector<std::string> methods;
 		std::string method;
 		std::string body;
+		std::string cgi_path;
 		std::vector<location> loc;
 		bool autoindex;
 };

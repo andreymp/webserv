@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:37:06 by jobject           #+#    #+#             */
-/*   Updated: 2022/02/24 18:54:01 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 15:35:58 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,14 @@ Request Config::parseServer(std::size_t & i, std::string const & file) const {
 			i += std::strlen("autoindex ");
 			if (!file.compare(i, 2, "on"))
 				req.setAutoindex(true);
-			i += req.getAutoindex() ? 2 : 3; 
+			i += req.getAutoindex() ? 2 : 3;
+		} else if (!file.compare(i, std::strlen("cgi_path "), "cgi_path ")) {
+			i += std::strlen("cgi_path ");
+			std::size_t tmp = file.find('\n', i);
+			if (tmp == std::string::npos)
+				throw Config::ConfigException();
+			req.setCgiPath(file.substr(i, tmp - i));
+			i = tmp + 1;
 		} else if (!file.compare(i, std::strlen("allow_methods "), "allow_methods ")) {
 			i += std::strlen("allow_methods ");
 			std::vector<std::string> allowMeth;

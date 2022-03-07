@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 18:04:22 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 14:29:37 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void ServerHandler::launch() {
 			// Recieving
 			for (std::map<int, Server *>::iterator it = sockets.begin(); it != sockets.end(); ++it) {
 				if (FD_ISSET(it->first, &readingSet)) {
-					std::cout << "in recieve" << std::endl;
+					// std::cout << "in recieve" << std::endl;
 					ret = it->second->recieve(it->first);
 					if (ret == -1) {
 						FD_CLR(it->first, &fds);
