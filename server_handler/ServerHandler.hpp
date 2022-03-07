@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerHandler.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 15:45:17 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/02 20:34:23 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 21:25:04 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ class ServerHandler {
 		class ServerHandlerException : public std::exception {
 			virtual const char * what() const throw();	
 		};
+		void get_fd();
+		std::vector<int> vec_fd;
 	private:
 		ServerHandler();
 		

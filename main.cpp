@@ -3,14 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:14:07 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 19:13:15 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 21:35:59 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+
+
+std::vector<int> fd;
+
+void endServer(int __unused signal)
+{
+	close(4);
+	close(3);
+	std::cout << "CLOSE DONE!" << std::endl;
+	for (std::vector<int>::iterator it = fd.begin(); it != fd.end(); ++it)
+	{
+		std::cout << "IT:" <<  *it << std::endl;
+	}
+	exit(0);
+}
 
 bool checkArgs(int argc, char **argv) {
 	if (argc > 2)
@@ -32,42 +47,16 @@ int main(int argc, char **argv) {
 	}
 	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
 	try {
+		signal(SIGINT, endServer);
+		signal(SIGKILL, endServer);
 		std::vector<Request> requests(conf.parse());
-		// std::cout << "hi\n"; 
-		// Server server(requests[0].getHost(), requests[0].getPort());
-		// server.setup();
-		// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 21\n\nThis is my first page";
-		// while (true) {
-		// 	int socket_fd = server.makeNonBlocking();
-		// 		char buffer[30000] = {0};
-        // int valread = read(socket_fd , buffer, 30000);
-        // printf("%s\n",buffer );
-        // write(socket_fd , hello , std::strlen(hello));
-        // printf("------------------Hello message sent-------------------\n");
-        // close(socket_fd);
-		// }
 		ServerHandler server(requests);
 		server.setup();
+		fd = server.vec_fd;
 		server.launch();
 		server.closeConnection();
 	} catch (const std::exception & e) {
 		std::cout << e.what() << std::endl;
 	}
-	// int addrlen = sizeof(address);
-	// int newSocket;
-	// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 21\n\nThis is my first page";
-	// while (true) {
-	// 	if ((newSocket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-	// 		std::cerr << "Cannot accept" << std::endl;
-	// 		return 1;
-	// 	}
-	// 	char buffer[30000] = {0};
-    //     int valread = read(newSocket , buffer, 30000);
-    //     printf("%s\n",buffer );
-    //     write(newSocket , hello , strlen(hello));
-    //     printf("------------------Hello message sent-------------------\n");
-    //     close(newSocket);
-
-	// }
 	return 0;
 }

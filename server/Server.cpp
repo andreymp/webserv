@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 18:47:08 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 22:58:46 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ long Server::getServerFd() const { return server_fd; }
 
 void Server::setAddress() {
 	std::memset((char *) &address, 0, sizeof(address));
-	address.sin_family = AF_INET;
+	address.sin_family = PF_INET;
 	address.sin_addr.s_addr = htonl(host);
 	address.sin_port = htons(port);
 }
@@ -46,8 +46,8 @@ int Server::makeNonBlocking() {
 		std::cerr << "Accept failure" << std::endl;
 		throw Server::ServerException();
 	}
-	else if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
-		throw Server::ServerException();
+	// else if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
+	// 	throw Server::ServerException();
 	messages.insert(std::make_pair(socket_fd, std::string("")));
 	return socket_fd;
 }
@@ -106,6 +106,7 @@ int Server::send(int socket_fd) {
 }
 
 void Server::recieveHandler(int socket_fd) {
+	std::cout << "socket_fd" << socket_fd << std::endl; 
 	std::size_t chunk = messages[socket_fd].find(CHUNK);
 	if (chunk != std::string::npos && chunk < messages[socket_fd].find(END))
 		handleChunk(socket_fd);
@@ -129,14 +130,10 @@ void Server::recieveHandler(int socket_fd) {
 			request.setMethod("POST");
 		else if (messages[socket_fd].find("DELETE") == 0)
 			request.setMethod("DELETE");
-		else 
+		else
 			request.setMethod("I am the best");
 		request.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
-		std::size_t pos = messages[socket_fd].find(' ');
-		std::size_t pos_end = messages[socket_fd].find(' ', pos + 1);
-		Response response;
-		std::string buf = messages[socket_fd].substr(pos + 2, pos_end - pos - 2);
-		request.PATH = req.getRoot() + buf;
+		request.PATH = req.getRoot().substr(0, req.getRoot().size() - 1) + request.HEAD;
 		if (inLoc) {
 			request.setMethods(locale.methods);
 			request.setRoot(locale.root == "" ? req.getRoot() : locale.root);
@@ -145,10 +142,21 @@ void Server::recieveHandler(int socket_fd) {
 			request.setCgiPath(locale.cgi_path);
 			request.setClientBodySize(locale.client_body_size);
 		}
+		std::cout << "REQUEST INFO: " << std::endl;
+		// std::cout << request.getMethod() << std::endl;
+		// std::cout << request.getAutoindex() << std::endl;
+		// std::cout << request.getMethods().size() << std::endl;
+		// std::cout << request.getMethods()[0] << std::endl;
+		// std::cout << request.getMethods()[1] << std::endl;
+		// std::cout << request.getMethods()[2] << std::endl;
+		// std::cout << request.getRoot() << std::endl;
+		// std::cout << request.PATH << std::endl;
+
+		Response response;
 		response.call(request);
 		messages.erase(socket_fd);
 		messages.insert(std::make_pair(socket_fd, response.getResponse()));
-		std::cout << messages[socket_fd] << std::endl;
+		// std::cout << messages[socket_fd] << std::endl;
 	}
 }
 
@@ -174,11 +182,15 @@ void Server::handleChunk(int socket_fd) {
 void Server::closeServer(int socket_fd) const { close(socket_fd); }
 
 void Server::setup() {
-	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+	if ((server_fd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 		std::cerr << "Cannot create socket" << std::endl;
 		throw Server::ServerException();
 	}
+	int option = 1;
+	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+
 	setAddress();
+	// std::cout << "SERVER FD" << server_fd << std::endl;
 	if ((bind(server_fd, (struct sockaddr *) &address, sizeof(address))) < 0) {
 		std::cerr << "Bind failure" << std::endl;
 		throw Server::ServerException();

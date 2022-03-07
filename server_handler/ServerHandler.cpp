@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 14:29:37 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 22:56:07 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,14 @@ ServerHandler & ServerHandler::operator=(const ServerHandler & other) {
 }
 
 const char * ServerHandler::ServerHandlerException::what() const throw() { return "ServerHandler exception occured"; }
+
+void	ServerHandler::get_fd()
+{
+	std::vector <int> vec;
+	
+	for(std::map<int, Server>::iterator it = servers.begin(); it != servers.end(); ++it) 
+		vec_fd.push_back(it->first);
+}
 
 void ServerHandler::setup() {
 	FD_ZERO(&fds);
@@ -60,8 +68,10 @@ void ServerHandler::launch() {
 			FD_ZERO(&writingSet);
 			for (int i = 0; i < fill.size(); ++i)
 				FD_SET(fill[i], &writingSet);
+			// std::cout << "BEFORE" << std::endl;
 			ret = select(maxFD + 1, &readingSet, &writingSet, nullptr, &timeout);
-			//std::cout << "hi " + std::to_string(ret) << std::endl;
+				// std::cout << "AFTER" << std::endl;
+			// std::cout << "hi " + std::to_string(ret) << std::endl;
 		}
 		if (ret > 0) {
 			// Sending
@@ -103,7 +113,8 @@ void ServerHandler::launch() {
 				if (FD_ISSET(it->first, &readingSet)) {
 					int tmpSocket;
 					if ((tmpSocket = it->second.makeNonBlocking()) >= 0) {
-						FD_SET(tmpSocket, &fds); // изменил тут
+						vec_fd.push_back(tmpSocket); //new
+						FD_SET(tmpSocket, &fds);
 						sockets.insert(std::make_pair(tmpSocket, &it->second));
 						if (tmpSocket > maxFD)
 							maxFD = tmpSocket;

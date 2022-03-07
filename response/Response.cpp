@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 18:23:33 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 20:08:36 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,6 @@ std::map<std::string, void (Response::*)(Request &)> Response::_method = Respons
   */
 void			Response::call(Request & request)
 {
-	// std::cout << request.getAutoindex() << std::endl;
-	// std::cout << request.getRoot() << std::endl;
-	// std::cout << request.getIndex() << std::endl;
     std::pair<int, std::string> arr[] =
     {
         std::make_pair(400,"pages/default_error_pages/400.html"),
@@ -207,11 +204,10 @@ void			Response::deleteMethod(Request & __unused request)
 		_code = 404;
 	if (_code == 403 || _code == 404)
 		_response = this->readHtml(_errorMap[_code]);
-	//_response = head.getHeader(_response.size(), _path, _code, _type, request.getLocation(), request.getLang()) + "\r\n" + _response;
+	std::string language = "en-us";
+	std::string ContentLocation = request.getRoot();
+	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, language) + "\r\n" + _response;
 }
-
-
-// }
 
 
 // Utils
@@ -266,15 +262,24 @@ int				Response::readContent(void)
 {
 	std::ifstream		file;
 	std::stringstream	buffer;
-		_type = "text/html"; // когда надо а когда нет???
 
+	_type = "text/html";
+	if ( _path.find(".") != std::string::npos)
+		_type =  _path.substr(_path.find("."), _path.size());
+	if (_type == ".png")
+		_type = "image/png";
+	if (_type == ".jpg")
+		_type = "image/jpg";
+	if (_type == ".gif")
+		_type = "image/gif";
+	if (_type == ".mp4")
+		_type = "video/mp4";
 	_response = "";
 	// std::cout << "{PATH}" << _path << _index << std::endl;
 	if (_isAutoIndex && !pathIsFile(_path))
 	{
 		buffer << this -> getPage_autoindex();
 		_response = buffer.str();
-		_type = "text/html";
 	}
 	else if (pathIsFile(_path))
 	{
@@ -326,40 +331,6 @@ int				Response::readContent(void)
 	return (200);
 }
 
-// int				Response::writeContent(std::string content)
-// {
-// 	std::ofstream	file;
-
-// /* "Нет содержимого". Нет содержимого для ответа на запрос, 
-// но заголовки ответа, которые могут быть полезны, присылаются. Клиент может использовать 
-// их для обновления кешированных заголовков полученных ранее для этого ресурса.	
-// */
-// 	if (pathIsFile(_path))
-// 	{
-// 		file.open(_path.c_str());
-// 		file << content;
-// 		file.close();
-// 		return (204);
-// 	}
-// 	else
-// 	{
-// 		/*
-// 		"Запрещено". У клиента 
-// 		нет прав доступа к содержимому, поэтому сервер отказывается дать надлежащий ответ. 	
-// 		*/
-// 		file.open(_path.c_str(), std::ofstream::out | std::ofstream::trunc);
-// 		if (file.is_open() == false)
-// 			return (403);
-
-// 		/* "Создано". Запрос успешно выполнен и в результате
-// 		был создан ресурс. Этот код обычно присылается в ответ на запрос PUT "ПОМЕСТИТЬ".
-// 		*/
-// 		file << content;
-// 		file.close();
-// 		return (201);
-// 	}
-// }
-
 std::string		Response::readHtml(const std::string& path)
 {
 	std::ofstream		file;
@@ -381,14 +352,10 @@ std::string		Response::readHtml(const std::string& path)
 		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
 }
 
-// Getter functions
-
 std::string		Response::getResponse(void)
 {
 	return (_response);
 }
-
-// Overloaders
 
 Response & Response::operator=(const Response & src)
 {
@@ -397,8 +364,6 @@ Response & Response::operator=(const Response & src)
 	_code = src._code;
 	return (*this);
 }
-
-// Constructors and destructors
 
 Response::Response(void) {}
 
