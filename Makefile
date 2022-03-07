@@ -8,6 +8,7 @@ SRCS =	main.cpp \
 		server_handler/ServerHandler.cpp \
 		cgi/CGIHandler.cpp \
 		response/Response.cpp \
+		response/ResponseHeader.cpp \
 
 INC	= 	cnf/Config.hpp \
 		server/Server.hpp \
@@ -15,6 +16,7 @@ INC	= 	cnf/Config.hpp \
 		cgi/CGIHandler.hpp \
 		server_handler/ServerHandler.hpp \
 		response/Response.hpp \
+		response/ResponseHeader.hpp \
 		webserv.hpp \
 
 OBJS = $(SRCS:.cpp=.o)

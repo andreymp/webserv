@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 13:02:28 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 19:08:51 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 12:53:31 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 # include "request/Request.hpp"
 # include "server_handler/ServerHandler.hpp"
 # include "cgi/CGIHandler.hpp"
+# include "response/Response.hpp"
 
 # define END "\r\n\r\n"
 # define CHUNK "Transfer-Encoding: chunked"

@@ -6,11 +6,12 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 13:47:06 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 13:34:45 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "ResponseHeader.hpp"
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <fstream>      // std::ifstream
@@ -24,13 +25,13 @@
 int		pathIsFile(const std::string& path)
 {
 	/*
-int stat(const char *restrict path, struct stat *restrict buf);
-ОПИСАНИЕ
-Функция stat() должна получить информацию об указанном файле и записать ее в область, на которую указывает 
-аргумент buf. Аргумент пути указывает на путь, 
-именующий файл. Разрешение на чтение, запись или выполнение указанного файла не требуется.
-Upon successful completion, 0 shall be returned. Otherwise, -1 shall be 
-returned and errno set to indicate the error.
+		int stat(const char *restrict path, struct stat *restrict buf);
+		ОПИСАНИЕ
+		Функция stat() должна получить информацию об указанном файле и записать ее в область, на которую указывает 
+		аргумент buf. Аргумент пути указывает на путь, 
+		именующий файл. Разрешение на чтение, запись или выполнение указанного файла не требуется.
+		Upon successful completion, 0 shall be returned. Otherwise, -1 shall be 
+		returned and errno set to indicate the error.
 	*/
 
 	struct stat s;
@@ -74,64 +75,51 @@ std::map<std::string, void (Response::*)(Request &)> Response::_method = Respons
 вернув заголовок Retry-After
   */
 void			Response::call(Request & request)
-{							
+{
+	// std::cout << request.getAutoindex() << std::endl;
+	// std::cout << request.getRoot() << std::endl;
+	// std::cout << request.getIndex() << std::endl;
     std::pair<int, std::string> arr[] =
     {
-        std::make_pair(400,"./pages/default_error_pages/400.html"),
-        std::make_pair(401,"./pages/default_error_pages/401.html"),
-        std::make_pair(403,"./pages/default_error_pages/403.html"),
-        std::make_pair(404,"./pages/default_error_pages/404.html"),
-        std::make_pair(500,"./pages/default_error_pages/500.html"),
-        std::make_pair(503,"./pages/default_error_pages/503.html"),
+        std::make_pair(400,"pages/default_error_pages/400.html"),
+        std::make_pair(401,"pages/default_error_pages/401.html"),
+        std::make_pair(403,"pages/default_error_pages/403.html"),
+        std::make_pair(404,"pages/default_error_pages/404.html"),
+        std::make_pair(500,"pages/default_error_pages/500.html"),
+        std::make_pair(503,"pages/default_error_pages/503.html"),
     };
     int n = sizeof(arr) / sizeof(arr[0]);
     std::map<int, std::string> m(arr, arr + n);
 	_errorMap = m; // код -> путь до файла
 
 	_isAutoIndex = request.getAutoindex();
-	_host = request.getHost();
+	_host = "localhost";
 	_port = request.getPort();
-	_code = 200;//request.getRet();
-	_path = request.getRoot();
+	_code = 200;
+	_path = request.PATH;
+	_index = request.getIndex();
 	std::vector<std::string> vec = request.getMethods();
 	if (std::find(vec.begin(), vec.end(), request.getMethod()) == vec.end())
 		_code = 405;
 	else if (request.getClinetBodySize() < request.getBody().size())
 		_code = 413;
 
-/*
-405 Method Not Allowed — указанный клиентом метод нельзя применить к текущему ресурсу. 
-В ответе сервер должен указать доступные методы в заголовке Allow, разделив их запятой.
- Эту ошибку сервер должен возвращать, если метод ему известен, но он не применим именно
-  к указанному в запросе ресурсу, если же указанный метод не применим на всём сервере, 
-  то клиенту нужно вернуть код 501 (Not Implemented). Появился в HTTP/1.1.
-  */
+	if (_code == 405 || _code == 413)
+	{
+		ResponseHeader	head;
 
-/* 
- 413 Payload Too Large — возвращается в случае, если сервер отказывается обработать
-  запрос по причине слишком большого размера тела запроса. Сервер может закрыть соединение, 
-  чтобы прекратить дальнейшую передачу запроса. Если проблема временная, то рекомендуется
-   в ответ сервера включить заголовок Retry-After с указанием времени, по истечении которого
-    можно повторить аналогичный запрос. Появился в HTTP/1.1. Ранее назывался 
-	«Request Entity Too Large».
-*/
-
-	// if (_code == 405 || _code == 413)
-	// {
-	// 	// ResponseHeader	head;
-
-	// 	std::string language = "en-us";
-	// 	std::string ContentLocation = "/";
-	// 	_response = head.notAllowed(request.getMethods(), ContentLocation, _code, language) + "\r\n";
-	// 	return ;
-	// }
-	// (this->*Response::_method[request.getMethod()])(request);
+		std::string language = "en-us";
+		std::string ContentLocation = "/";
+		_response = head.notAllowed(request.getMethods(), ContentLocation, _code, language) + "\r\n";
+		return ;
+	}
+	(this->*Response::_method[request.getMethod()])(request);
 }
 
 // Methods
 void			Response::getMethod(Request & request)
 {
-	// ResponseHeader	head;
+	ResponseHeader	head;
 
 	// if (request.getCgiPass() != "")
 	// {
@@ -159,13 +147,10 @@ void			Response::getMethod(Request & request)
 		_code = readContent();
 	else
 		_response = this->readHtml(_errorMap[_code]);
-	// if (_code == 500)
-	// 	_response = this->readHtml(_errorMap[_code]);
 
 	std::string language = "en-us";
-	std::string content_location = "/post_body";
-	std::string ContentLocation = "/";
-	// _response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, language) + "\r\n" + _response;
+	std::string ContentLocation = request.getRoot();
+	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, language) + "\r\n" + _response;
 }
 
 
@@ -229,9 +214,20 @@ void			Response::getMethod(Request & request)
 // }
 
 
-std::string         Response::getPage_autoindex(const char *path, std::string const &host, int port) {
-    std::string dirName(path);
-    DIR *dir = opendir(path);
+// Utils
+
+
+std::string         Response::getPage_autoindex() 
+{
+	std::string path(_path);
+
+	std::string dirName = "";
+	if (path != "pages/") //тут должен быть рут
+    	dirName = path.substr(path.find("pages/") + 6, path.size());
+
+	std::cout << "{PATH}" << dirName << std::endl;
+	char* ppath = const_cast<char*>(path.c_str());
+    DIR *dir = opendir(ppath);
     std::string page =\
     "<!DOCTYPE html>\n\
     <html>\n\
@@ -246,12 +242,15 @@ std::string         Response::getPage_autoindex(const char *path, std::string co
         std::cerr << "Error: could not open [" << path << "]" << std::endl;
         return "";
     }
-    if (dirName[0] != '/')
-        dirName = "/" + dirName;
     for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) 
     {
-        std::string a = "\t\t<p><a href=\"http://" + host + ": " + " " \
-        + std::to_string(port) + " " + dirName + "/" + std::string(dirEntry->d_name) + "\">" + std::string(dirEntry->d_name) + "</a></p>\n";
+        std::string a = "\t\t<p><a href=\"http://" + \
+
+		 _host + ":" + std::to_string(_port) + dirName + "/" + \
+		 	std::string(dirEntry->d_name) + "\">" + \
+			std::string(dirEntry->d_name) + \
+		"</a></p>\n";
+		
         page += a;
     }
     page +="\
@@ -267,10 +266,17 @@ int				Response::readContent(void)
 {
 	std::ifstream		file;
 	std::stringstream	buffer;
+		_type = "text/html"; // когда надо а когда нет???
 
 	_response = "";
-
-	if (pathIsFile(_path))
+	std::cout << "{PATH}" << _path << _index << std::endl;
+	if (_isAutoIndex && !pathIsFile(_path))
+	{
+		buffer << this -> getPage_autoindex();
+		_response = buffer.str();
+		_type = "text/html";
+	}
+	else if (pathIsFile(_path))
 	{
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
@@ -288,11 +294,24 @@ int				Response::readContent(void)
 
 		file.close();
 	}
-	else if (_isAutoIndex) {
-		buffer << this -> getPage_autoindex(_path.c_str(),\
-			std::to_string(_host), _port);
+	else if (pathIsFile(_path + _index))
+	{
+		std::string file_with_index = _path + _index;
+		std::cout << _path + _index << std::endl;
+		file.open(file_with_index.c_str(), std::ifstream::in);
+		if ((file).is_open() == false)
+		{
+			/*
+			"Запрещено". У клиента нет прав доступа к содержимому,
+			 поэтому сервер отказывается дать надлежащий ответ.
+			 */ 	
+			_response = this->readHtml(_errorMap[403]);
+			return (403);
+		}
+		buffer << file.rdbuf();
 		_response = buffer.str();
-		_type = "text/html";
+	
+		file.close();
 	}
 	else
 	{
@@ -307,45 +326,47 @@ int				Response::readContent(void)
 	return (200);
 }
 
-int				Response::writeContent(std::string content)
+// int				Response::writeContent(std::string content)
+// {
+// 	std::ofstream	file;
+
+// /* "Нет содержимого". Нет содержимого для ответа на запрос, 
+// но заголовки ответа, которые могут быть полезны, присылаются. Клиент может использовать 
+// их для обновления кешированных заголовков полученных ранее для этого ресурса.	
+// */
+// 	if (pathIsFile(_path))
+// 	{
+// 		file.open(_path.c_str());
+// 		file << content;
+// 		file.close();
+// 		return (204);
+// 	}
+// 	else
+// 	{
+// 		/*
+// 		"Запрещено". У клиента 
+// 		нет прав доступа к содержимому, поэтому сервер отказывается дать надлежащий ответ. 	
+// 		*/
+// 		file.open(_path.c_str(), std::ofstream::out | std::ofstream::trunc);
+// 		if (file.is_open() == false)
+// 			return (403);
+
+// 		/* "Создано". Запрос успешно выполнен и в результате
+// 		был создан ресурс. Этот код обычно присылается в ответ на запрос PUT "ПОМЕСТИТЬ".
+// 		*/
+// 		file << content;
+// 		file.close();
+// 		return (201);
+// 	}
+// }
+
+std::string		Response::readHtml(const std::string& path)
 {
-	std::ofstream	file;
-
-/* "Нет содержимого". Нет содержимого для ответа на запрос, 
-но заголовки ответа, которые могут быть полезны, присылаются. Клиент может использовать 
-их для обновления кешированных заголовков полученных ранее для этого ресурса.	
-*/
-	if (pathIsFile(_path))
-	{
-		file.open(_path.c_str());
-		file << content;
-		file.close();
-		return (204);
-	}
-	else
-	{
-		/*
-		"Запрещено". У клиента 
-		нет прав доступа к содержимому, поэтому сервер отказывается дать надлежащий ответ. 	
-		*/
-		file.open(_path.c_str(), std::ofstream::out | std::ofstream::trunc);
-		if (file.is_open() == false)
-			return (403);
-
-/* "Создано". Запрос успешно выполнен и в результате
- был создан ресурс. Этот код обычно присылается в ответ на запрос PUT "ПОМЕСТИТЬ".
- */
-		file << content;
-		file.close();
-		return (201);
-	}
-}
-
-std::string		Response::readHtml(const std::string& path) {
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (pathIsFile(path)) {
+	if (pathIsFile(path))
+	{
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 			return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
@@ -357,20 +378,33 @@ std::string		Response::readHtml(const std::string& path) {
 		return (buffer.str());
 	}
 	else
-		return "<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n";
+		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
 }
 
-std::string		Response::getResponse() { return _response; }
+// Getter functions
 
-Response & Response::operator=(const Response & src) {
-	if (this != &src) {
-		_response = src._response;
-		_path = src._path;
-		_code = src._code;
-	}
-	return *this;
+std::string		Response::getResponse(void)
+{
+	return (_response);
 }
 
-Response::Response() {}
-Response::Response(const Response & src) { *this = src; }
-Response::~Response() {}
+// Overloaders
+
+Response & Response::operator=(const Response & src)
+{
+	_response = src._response;
+	_path = src._path;
+	_code = src._code;
+	return (*this);
+}
+
+// Constructors and destructors
+
+Response::Response(void) {}
+
+Response::Response(const Response & src)
+{
+	*this = src;
+}
+
+Response::~Response(void) {}

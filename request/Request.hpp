@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 18:02:19 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 13:01:12 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ class Request {
 		std::vector<std::string> const & getMethods() const;
 		std::vector<location> const & getLocation() const;
 		bool getAutoindex() const;
+
+		std::string PATH;
 	private:
 		unsigned int host;
 		int port;

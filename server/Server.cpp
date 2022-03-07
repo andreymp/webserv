@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/04 19:06:28 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 13:26:02 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,17 +111,23 @@ void Server::recieveHandler(int socket_fd) {
 		handleChunk(socket_fd);
 	std::cout << messages[socket_fd] << std::endl;
 	if (messages[socket_fd] != "") {
-		Request requestForResponse;
 		if (messages[socket_fd].find("GET") == 0)
-			requestForResponse.setMethod("GET");
+			req.setMethod("GET");
 		else if (messages[socket_fd].find("POST") == 0)
-			requestForResponse.setMethod("POST");
+			req.setMethod("POST");
 		else if (messages[socket_fd].find("DELETE") == 0)
-			requestForResponse.setMethod("DELETE");
+			req.setMethod("DELETE");
 		else 
-			requestForResponse.setMethod("I am the best");
-		requestForResponse.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
+			req.setMethod("I am the best");
+		req.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
+		std::size_t pos = messages[socket_fd].find(' ');
+		std::size_t pos_end = messages[socket_fd].find(' ', pos + 1);
+		Response response;
+		std::string buf = messages[socket_fd].substr(pos + 2, pos_end - pos - 2);
+		req.PATH = req.getRoot() + buf;
+		response.call(req);
 		messages.erase(socket_fd);
+		messages.insert(std::make_pair(socket_fd, response.getResponse()));
 		std::cout << messages[socket_fd] << std::endl;
 	}
 }
