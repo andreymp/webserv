@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 14:56:19 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/08 03:39:58 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,17 @@ public:
 	int				fileExists(std::string path);
 	std::string		readHtml(const std::string& path);
 	std::string     getPage_autoindex();
+	std::string					_response;
 	
 private:
-	std::string					_response;
+	std::string					_language;
 	std::string					_path;
 	std::string					_index;
 	int							_code;
 	std::string					_type;
 	bool						_isAutoIndex;
 	std::string					_host;
+	std::string					_root;
 	int							_port;
 	std::map<int, std::string>	_errorMap;
 

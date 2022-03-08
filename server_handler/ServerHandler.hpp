@@ -6,7 +6,7 @@
 /*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 15:45:17 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 21:25:04 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/08 03:54:29 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,13 @@ class ServerHandler {
 		};
 		void get_fd();
 		std::vector<int> vec_fd;
+		std::map<int, Server> servers;
 	private:
 		ServerHandler();
 		
 		std::vector<int> fill;
 		std::map<int, Server *> sockets;
 		std::vector<Request> reqArray;
-		std::map<int, Server> servers;
 		long maxFD;
 		fd_set fds;
 };

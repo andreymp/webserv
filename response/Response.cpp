@@ -6,7 +6,7 @@
 /*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 22:59:35 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/08 03:25:15 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,8 @@ void			Response::call(Request & request)
 	_code = 200;
 	_path = request.PATH;
 	_index = request.getIndex();
+	_language = request.get_language();
+	_root = request.getRoot();
 	std::vector<std::string> vec = request.getMethods();
 	if (std::find(vec.begin(), vec.end(), request.getMethod()) == vec.end())
 		_code = 405;
@@ -107,9 +109,8 @@ void			Response::call(Request & request)
 	{
 		ResponseHeader	head;
 
-		std::string language = "en-us";
 		std::string ContentLocation = "/";
-		_response = head.notAllowed(request.getMethods(), ContentLocation, _code, language) + "\r\n";
+		_response = head.notAllowed(request.getMethods(), ContentLocation, _code, _language) + "\r\n";
 		return ;
 	}
 	(this->*Response::_method[request.getMethod()])(request);
@@ -133,8 +134,6 @@ void			Response::getMethod(Request & request)
 			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
 			if (str.find("Status: ") == 0)
 				_code = std::atoi(str.substr(8, 3).c_str());
-			else if (str.find("Content-type: ") == 0)
-				_type = str.substr(14, str.size());
 			i += str.size() + 2;
 		}
 		while (_response.find("\r\n", j) == j)
@@ -147,9 +146,8 @@ void			Response::getMethod(Request & request)
 	else
 		_response = this->readHtml(_errorMap[_code]);
 
-	std::string language = "en-us";
 	std::string ContentLocation = request.getRoot();
-	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, language) + "\r\n" + _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, _language) + "\r\n" + _response;
 }
 
 
@@ -205,9 +203,8 @@ void			Response::deleteMethod(Request & __unused request)
 		_code = 404;
 	if (_code == 403 || _code == 404)
 		_response = this->readHtml(_errorMap[_code]);
-	std::string language = "en-us";
 	std::string ContentLocation = request.getRoot();
-	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, language) + "\r\n" + _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, _language) + "\r\n" + _response;
 }
 
 
@@ -219,8 +216,8 @@ std::string         Response::getPage_autoindex()
 	std::string path(_path);
 
 	std::string dirName = "";
-	if (path != "pages/") //тут должен быть рут
-    	dirName = path.substr(path.find("pages/") + 6, path.size());
+	if (path != _root)
+    	dirName = "/" + path.substr(path.find(_root) + _root.size(), path.size());
 
 	// std::cout << "{PATH}" << dirName << std::endl;
 	char* ppath = const_cast<char*>(path.c_str());
@@ -269,6 +266,8 @@ int				Response::readContent(void)
 		_type =  _path.substr(_path.find("."), _path.size());
 	if (_type == ".png")
 		_type = "image/png";
+	if (_type == ".html")
+		_type = "text/html";
 	if (_type == ".jpg")
 		_type = "image/jpg";
 	if (_type == ".gif")

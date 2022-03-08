@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 17:24:31 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 23:36:44 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ class Request {
 		void setMethod(std::string const & _method);
 		void setBody(std::string const & _body);
 		void setAutoindex(bool flag);
-		
+		void set_language(std::string language);
+
 		unsigned int getHost() const;
 		std::string const & getMethod() const ; 
 		int getPort() const;
@@ -46,7 +47,7 @@ class Request {
 		std::vector<std::string> const & getMethods() const;
 		std::vector<location> const & getLocation() const;
 		bool getAutoindex() const;
-
+		std::string get_language();
 		std::string PATH;
 		std::string HEAD;
 	private:
@@ -61,6 +62,7 @@ class Request {
 		std::string body;
 		std::string cgi_path;
 		std::vector<location> loc;
+		std::string language;
 		bool autoindex;
 };
 

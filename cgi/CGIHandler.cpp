@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIHandler.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 21:32:10 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 23:11:19 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ std::string CGIHandler::exec(const char * filename) {
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fds[1], STDOUT_FILENO);
 		char * const * argv = nullptr;
-		execve(path, argv, env);
+		execve("/usr/bin/php", argv, env); // тут так
 		std::cerr << "Execve failure\n" << strerror(errno) << std::endl;
 		write(fds[1], SERVER_ERROR, std::strlen(SERVER_ERROR));
 		delete [] argv[0];

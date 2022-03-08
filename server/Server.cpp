@@ -6,11 +6,7 @@
 /*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2022/03/07 22:58:46 by celys            ###   ########.fr       */
-=======
-/*   Updated: 2022/03/07 19:52:07 by jobject          ###   ########.fr       */
->>>>>>> bcdb76db7a9b79c64d79d4c04567451ade48f73e
+/*   Updated: 2022/03/08 04:15:15 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +14,7 @@
 
 Server::Server() {}
 Server::~Server() {}
-Server::Server(Request const & _req) : host(_req.getHost()), port(_req.getPort()), req(_req), messages() {}
+Server::Server(Request const & _req) : host(_req.getHost()), port(_req.getPort()), req(_req), messages() {server_for_redir = -1;}
 Server::Server(const Server & other) { *this = other; }
 Server & Server::operator=(const Server & other) {
 	if (this != &other) {
@@ -28,6 +24,7 @@ Server & Server::operator=(const Server & other) {
 		address = other.address;
 		messages = other.messages;
 		req = other.req;
+		server_for_redir = other.server_for_redir;
 	}
 	return *this;
 }
@@ -50,8 +47,8 @@ int Server::makeNonBlocking() {
 		std::cerr << "Accept failure" << std::endl;
 		throw Server::ServerException();
 	}
-	// else if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
-	// 	throw Server::ServerException();
+	else if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
+		throw Server::ServerException();
 	messages.insert(std::make_pair(socket_fd, std::string("")));
 	return socket_fd;
 }
@@ -108,6 +105,13 @@ int Server::send(int socket_fd) {
 		return ret;
 	}
 }
+/*
+	IF REDIRECT : 
+	
+	HTTP/1.1 301 Moved Permanently 
+	Location: http://www.example.org/index.asp
+	но там есть еще 302
+*/
 
 void Server::recieveHandler(int socket_fd) {
 	std::cout << "socket_fd" << socket_fd << std::endl; 
@@ -137,6 +141,17 @@ void Server::recieveHandler(int socket_fd) {
 		else
 			request.setMethod("I am the best");
 		request.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
+		
+		//set Language
+		request.set_language("en-us");
+		std::string tmp5 = messages[socket_fd].substr(0, messages[socket_fd].find(END));
+		while (tmp5.find("\n") != std::string::npos)
+		{
+			if (tmp5.find("Accept-Language:") == 0)
+				request.set_language(tmp5.substr(tmp5.find("Accept-Language: ") + 17, tmp5.find("\n")));
+			tmp5 = tmp5.substr(tmp5.find("\n") + 1, tmp5.size());
+		}
+
 		request.PATH = req.getRoot().substr(0, req.getRoot().size() - 1) + request.HEAD;
 		if (inLoc) {
 			request.setMethods(locale.methods);
@@ -146,7 +161,7 @@ void Server::recieveHandler(int socket_fd) {
 			request.setCgiPath(locale.cgi_path);
 			request.setClientBodySize(locale.client_body_size);
 		}
-		std::cout << "REQUEST INFO: " << std::endl;
+		// std::cout << "REQUEST INFO: " << std::endl;
 		// std::cout << request.getMethod() << std::endl;
 		// std::cout << request.getAutoindex() << std::endl;
 		// std::cout << request.getMethods().size() << std::endl;
@@ -157,7 +172,16 @@ void Server::recieveHandler(int socket_fd) {
 		// std::cout << request.PATH << std::endl;
 
 		Response response;
-		response.call(request);
+		std::cout << "server_for_redir" << server_for_redir << std::endl;
+		if (server_for_redir != -1)
+		{
+			response._response += "HTTP/1.1 301 Moved Permanently\n";
+			std::string redir_server = "http://localhost:400";
+			response._response += "Location: " + redir_server + \
+								request.HEAD +  "\n\r\n\r";
+		}
+		else
+			response.call(request);
 		messages.erase(socket_fd);
 		messages.insert(std::make_pair(socket_fd, response.getResponse()));
 	}

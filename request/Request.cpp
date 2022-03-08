@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 17:26:54 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/07 23:37:44 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void Request::setMethods(std::vector<std::string> & _methods) { methods = _metho
 void Request::setLocation(std::vector<location> const & locale) { loc = locale;}
 void Request::setClientBodySize(int _size) { client_body_size = _size; }
 void Request::setAutoindex(bool flag) { autoindex = flag; }
+void Request::set_language(std::string language) { this -> language = language; }
 void Request::setMethod(std::string const & _method) { method = _method; }
 void Request::setBody(std::string const & _body) {
 	body = _body;
@@ -69,4 +70,5 @@ std::vector<std::string> const & Request::getMethods() const { return methods; }
 std::vector<location> const & Request::getLocation() const { return loc; }
 int Request::getClinetBodySize() const { return client_body_size; }
 bool Request::getAutoindex() const { return autoindex; }
+std::string Request::get_language() { return (language); }
 std::string const & Request::getCgiPath() const { return cgi_path; }
