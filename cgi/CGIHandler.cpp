@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIHandler.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 21:22:37 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/08 23:27:23 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("SERVER_PORT", std::to_string(request.getPort())));
 	envp.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
 	envp.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));
-	envp.insert(std::make_pair("name", "qwerty"));
-	envp.insert(std::make_pair("email", "hhh"));
+	envp.insert(std::make_pair("a1", "qwerty"));
+	envp.insert(std::make_pair("a2", "hhh"));
 	// std::cout << request.getBody() << std::endl;
 	
 	// std::string tmp;
@@ -119,7 +119,9 @@ std::string CGIHandler::exec(const char * filename) {
 	// int i = -1;
 	// while (env[++i])
 	// 	std::cout << env[i] << std::endl;
-	std::string path = std::string(filename) == "" ? request.PATH : request.PATH + "/" + std::string(filename);
+	// std::string path = std::string(filename) == "" ? request.PATH : request.PATH + "/" + std::string(filename);
+	std::string path = "/Users/celys/Desktop/main_123/pages/welcome.php";
+	// std::cout << path.c_str() << std::endl;
 	// std::cout << path << std::endl;
 	write(fds[0], body.c_str(), body.size());
 	lseek(fds[0], 0, SEEK_SET);
@@ -131,6 +133,7 @@ std::string CGIHandler::exec(const char * filename) {
 	if (!pid) {
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fds[1], STDOUT_FILENO);
+		std::cerr << path.c_str() << std::endl;
 		execve(path.c_str(), nullptr, env);
 		std::cerr << "Execve failure\n" << strerror(errno) << std::endl;
 		write(fds[1], SERVER_ERROR, std::strlen(SERVER_ERROR));
@@ -138,12 +141,13 @@ std::string CGIHandler::exec(const char * filename) {
 	} else {
 		int ret;
 		
-		waitpid(0, nullptr, 0);
+		waitpid(pid, nullptr, 0);
 		lseek(fds[1], 0, SEEK_SET);
 		char buff[DEFUALT_SIZE + 1] = {0};
 		while ((ret = read(fds[1], buff, DEFUALT_SIZE)) > 0) {
 			res += buff;
 		}
+		// std::cout << res << std::endl;
 		closeFunction(in, out, fin, fout, fds, env);
 	}
 	return res + END;

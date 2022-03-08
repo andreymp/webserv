@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 21:39:37 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/08 22:39:39 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void Server::recieveHandler(int socket_fd) {
 			request.setMethod("GET");
 		else if (messages[socket_fd].find("POST") == 0) {
 			request.setMethod("POST");
-			request.QUERY = messages[socket_fd].substr(messages[socket_fd].find("?"));
+			// request.QUERY = messages[socket_fd].substr(messages[socket_fd].find("?"));
 		}
 		else if (messages[socket_fd].find("DELETE") == 0)
 			request.setMethod("DELETE");

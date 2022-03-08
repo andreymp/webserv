@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
+/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 20:53:24 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/08 23:28:58 by celys            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,24 +117,30 @@ void			Response::postMethod(Request & request)
 {
 	ResponseHeader	head;
 
-	request.setCgiPath(request.PATH);
-	if (request.getCgiPath() != "") {
-		request.setCgiPath("");
+	// std::cout << "request.getCgiPath()" << request.getCgiPath() << std::endl;
+	// request.setCgiPath(request.PATH);
+	// if (request.getCgiPath() != "") {
+	// 	request.setCgiPath("");
 		CGIHandler	cgi(request);
 		_response = cgi.exec(request.getCgiPath().c_str());
-		if (_response.find("Status: 500") != std::string::npos)
-			_response = this->readHtml(_errorMap[500]);
-		if (_response.find("<html>") != std::string::npos)
-			_type = "text/html";
-	}
-	else
-	{
-		_code = 204;
-		_response = "";
-	}
-	if (_code == 500)
-		_response = this->readHtml(_errorMap[_code]);
+		// if (_response.find("Status: 500") != std::string::npos)
+		// 	_response = this->readHtml(_errorMap[500]);
+		// if (_response.find("<html>") != std::string::npos)
+		_type = "text/html";
+	// }
+	// else
+	// {
+	// 	_code = 204;
+	// 	_response = "";
+	// }
+	// if (_code == 500)
+	// 	_response = this->readHtml(_errorMap[_code]);
+	std::cout << "BEFORE" << std::endl;
+			std::cout << _response << std::endl;
 	_response = head.getHeader(_response.size(), _path, _code, _type, request.PATH, request.get_language()) + "\r\n" + _response;
+			std::cout << "AFTER" << std::endl;
+		std::cout << _response << std::endl;
+		
 }
 
 void			Response::deleteMethod(Request & __unused request)
