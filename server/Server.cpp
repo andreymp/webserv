@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 17:01:59 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/08 21:39:37 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,7 @@ int Server::send(int socket_fd) {
 	но там есть еще 302
 */
 
-void Server::recieveHandler(int socket_fd) {
-	//std::cout << "socket_fd" << socket_fd << std::endl; 
+void Server::recieveHandler(int socket_fd) { 
 	std::size_t chunk = messages[socket_fd].find(CHUNK);
 	if (chunk != std::string::npos && chunk < messages[socket_fd].find(END))
 		handleChunk(socket_fd);
@@ -124,7 +123,7 @@ void Server::recieveHandler(int socket_fd) {
 		location locale;
 		std::size_t tmp = messages[socket_fd].find('/');
 		std::size_t last = tmp;
-		for (; messages[socket_fd][last] != ' ' && last < messages[socket_fd].size(); last++);
+		for (; messages[socket_fd][last] != ' ' && last < messages[socket_fd].size() && messages[socket_fd].at(last) != '?'; last++);
 		request.HEAD = messages[socket_fd][tmp + 1] == ' ' ? "/" : messages[socket_fd].substr(tmp, last - tmp);
 		bool inLoc = false;
 		for (std::size_t i = 0; i < req.getLocation().size(); ++i)
@@ -134,15 +133,15 @@ void Server::recieveHandler(int socket_fd) {
 			}
 		if (messages[socket_fd].find("GET") == 0)
 			request.setMethod("GET");
-		else if (messages[socket_fd].find("POST") == 0)
+		else if (messages[socket_fd].find("POST") == 0) {
 			request.setMethod("POST");
+			request.QUERY = messages[socket_fd].substr(messages[socket_fd].find("?"));
+		}
 		else if (messages[socket_fd].find("DELETE") == 0)
 			request.setMethod("DELETE");
 		else
 			request.setMethod("I am the best");
 		request.setBody(messages[socket_fd].substr(messages[socket_fd].find(END)));
-		
-		//set Language
 		request.set_language("en-us");
 		std::string tmp5 = messages[socket_fd].substr(0, messages[socket_fd].find(END));
 		while (tmp5.find("\n") != std::string::npos)
@@ -161,22 +160,11 @@ void Server::recieveHandler(int socket_fd) {
 			request.setCgiPath(locale.cgi_path);
 			request.setClientBodySize(locale.client_body_size);
 		}
-		// std::cout << "REQUEST INFO: " << std::endl;
-		// std::cout << request.getMethod() << std::endl;
-		// std::cout << request.getAutoindex() << std::endl;
-		// std::cout << request.getMethods().size() << std::endl;
-		// std::cout << request.getMethods()[0] << std::endl;
-		// std::cout << request.getMethods()[1] << std::endl;
-		// std::cout << request.getMethods()[2] << std::endl;
-		// std::cout << request.getRoot() << std::endl;
-		// std::cout << request.PATH << std::endl;
-
 		Response response;
-		std::cout << "server_for_redir" << server_for_redir << std::endl;
 		if (server_for_redir != -1)
 		{
 			response._response += "HTTP/1.1 301 Moved Permanently\n";
-			std::string redir_server = "http://localhost:400";
+			std::string redir_server = "http://localhost:" + std::to_string(port);
 			response._response += "Location: " + redir_server + \
 								request.HEAD +  END;
 		}

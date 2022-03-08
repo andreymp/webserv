@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 17:19:48 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/08 21:22:37 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ char ** CGIHandler::getEnv() const {
 	return env;
 }
 
-// "" means to add to request
 void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
 	envp.insert(std::make_pair("AUTH_TYPE", "Basic")); 
@@ -54,6 +53,44 @@ void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("SERVER_PORT", std::to_string(request.getPort())));
 	envp.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
 	envp.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));
+	envp.insert(std::make_pair("name", "qwerty"));
+	envp.insert(std::make_pair("email", "hhh"));
+	// std::cout << request.getBody() << std::endl;
+	
+	// std::string tmp;
+	// tmp = request.getBody();
+	// int pos_start_key = 0;
+	// int pos_start_value = 0;
+	// int pos_end_key = 0;
+	// int pos_end_value = 0;
+	// while (tmp.find("&") != std::string::npos)
+	// {
+	// 	int pos_end_key = tmp.find("=");
+	// 	int pos_end = tmp.find("=");
+	// 	std::string key = tmp.substr(pos_start_key, pos_end_key);
+	// 	std::string value = tmp.substr(pos_end_key + 1, pos_end_value);
+	// 	envp.insert(std::make_pair(key, value));
+	// 	pos_start_key = pos_end_value + 1;
+	// 	// std::cout << key << value << std::endl;
+	// 	tmp = tmp.substr(pos_end, tmp.size());
+	// }
+	
+	// envp.insert(std::make_pair(request.QUERY.substr(pos + 1, equal - pos - 1), request.QUERY.substr(equal + 1, ending - equal - 1))
+	// if (request.QUERY != "") {
+	// 	std::size_t end = request.QUERY.find("\r\n");
+	// 	std::size_t pos = request.QUERY.find(END) + 4;
+	// 	std::size_t equal = 0;
+	// 	std::size_t ending = 0;
+	// 	while (pos != end) {
+	// 		equal = request.QUERY.find('=', equal + 1);
+	// 		ending = request.QUERY.find('&', ending + 1);
+	// 		if (ending == std::string::npos)
+	// 			ending = end;
+	// 		envp.insert(std::make_pair(request.QUERY.substr(pos + 1, equal - pos - 1), request.QUERY.substr(equal + 1, ending - equal - 1)));
+	// 		std::cout << request.QUERY.substr(pos + 1, equal - pos - 1) + " + " + request.QUERY.substr(equal + 1, ending - equal - 1) << std::endl;
+	// 		pos = ending;
+	// 	}
+	// }
 }
 
 void CGIHandler::closeFunction(int in, int out, FILE * fin, FILE * fout, int fds[], char ** env) {
@@ -79,11 +116,11 @@ std::string CGIHandler::exec(const char * filename) {
 	int fds[2] = {fileno(fin), fileno(fout)};
 	std::string res = "";
 	
-	int i = -1;
+	// int i = -1;
 	// while (env[++i])
 	// 	std::cout << env[i] << std::endl;
-	std::string path = request.PATH + "/" + std::string(filename);
-	// std::cerr << path << std::endl;
+	std::string path = std::string(filename) == "" ? request.PATH : request.PATH + "/" + std::string(filename);
+	// std::cout << path << std::endl;
 	write(fds[0], body.c_str(), body.size());
 	lseek(fds[0], 0, SEEK_SET);
 	pid_t pid = fork();
@@ -94,12 +131,6 @@ std::string CGIHandler::exec(const char * filename) {
 	if (!pid) {
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fds[1], STDOUT_FILENO);
-		// char ** argv = new char*[3];
-		// argv[0] = new char[std::strlen("pages/php-cgi") + 1];
-		// argv[1] = new char[path.size() + 1];
-		// std::strcpy(argv[0], "pages/php-cgi");
-		// std::strcpy(argv[1], path.c_str());
-		// argv[2] = nullptr;
 		execve(path.c_str(), nullptr, env);
 		std::cerr << "Execve failure\n" << strerror(errno) << std::endl;
 		write(fds[1], SERVER_ERROR, std::strlen(SERVER_ERROR));

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 18:01:42 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/08 20:53:24 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,6 @@
 
 int		pathIsFile(const std::string& path)
 {
-	/*
-		int stat(const char *restrict path, struct stat *restrict buf);
-		ОПИСАНИЕ
-		Функция stat() должна получить информацию об указанном файле и записать ее в область, на которую указывает 
-		аргумент buf. Аргумент пути указывает на путь, 
-		именующий файл. Разрешение на чтение, запись или выполнение указанного файла не требуется.
-		Upon successful completion, 0 shall be returned. Otherwise, -1 shall be 
-		returned and errno set to indicate the error.
-	*/
-
 	struct stat s;
 	if (stat(path.c_str(), &s) == 0 )
 	{
@@ -49,8 +39,6 @@ int		pathIsFile(const std::string& path)
 		return 0;
 }
 
-// Static Assets
-
 std::map<std::string, void (Response::*)(Request &)>	Response::initMethods()
 {
 	std::map<std::string, void (Response::*)(Request &)> map;
@@ -63,18 +51,6 @@ std::map<std::string, void (Response::*)(Request &)>	Response::initMethods()
 
 std::map<std::string, void (Response::*)(Request &)> Response::_method = Response::initMethods();
 
-// Member functions
-
-
-/*
-405
-"Метод не разрешён". Сервер знает о запрашиваемом методе, но он был деактивирован 
-и не может быть использован. Два обязательных метода,  GET и HEAD,
-  никогда не должны быть деактивированы и не должны возвращать этот код ошибки.	
-413 
-Размер запроса превышает лимит, объявленный сервером. Сервер может закрыть соединение, 
-вернув заголовок Retry-After
-  */
 void			Response::call(Request & request)
 {
     std::pair<int, std::string> arr[] =
@@ -89,8 +65,7 @@ void			Response::call(Request & request)
     };
     int n = sizeof(arr) / sizeof(arr[0]);
     std::map<int, std::string> m(arr, arr + n);
-	_errorMap = m; // код -> путь до файла
-
+	_errorMap = m;
 	_isAutoIndex = request.getAutoindex();
 	_host = "localhost";
 	_port = request.getPort();
@@ -121,27 +96,14 @@ void			Response::getMethod(Request & request)
 {
 	ResponseHeader	head;
 
-	if (request.getCgiPath() != "")
-	{
+	if (request.getCgiPath() != "") {
 		CGIHandler	cgi(request);
-		size_t		i = 0;
-		size_t		j = _response.size() - 2;
-
 		_response = cgi.exec(request.getCgiPath().c_str());
-		// while (_response.find(END, i) != std::string::npos || _response.find("\r\n", i) == i)
-		// {
-		// 	std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
-		// 	if (str.find("Status: ") == 0)
-		// 		_code = std::atoi(str.substr(8, 3).c_str());
-		// 	i += str.size() + 2;
-		// }
-		// while (_response.find("\r\n", j) == j)
-		// 	j -= 2;
-
-		// _response = _response.substr(i, j - i);
-		// std::cout << "{" + _response + "}" << std::endl;
-	}
-	else if  (_code == 200)
+		if (_response.find("Status: 500") != std::string::npos)
+			_response = this->readHtml(_errorMap[500]);
+		if (_response.find("<html>") != std::string::npos)
+			_type = "text/html";
+	} else if  (_code == 200)
 		_code = readContent();
 	else
 		_response = this->readHtml(_errorMap[_code]);
@@ -155,27 +117,15 @@ void			Response::postMethod(Request & request)
 {
 	ResponseHeader	head;
 
-	if (request.getCgiPath() != "")
-	{
+	request.setCgiPath(request.PATH);
+	if (request.getCgiPath() != "") {
+		request.setCgiPath("");
 		CGIHandler	cgi(request);
-		size_t		i = 0;
-		size_t		j = _response.size() - 2;
-
 		_response = cgi.exec(request.getCgiPath().c_str());
-
-		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-		{
-			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
-			if (str.find("Status: ") == 0)
-				_code = std::atoi(str.substr(8, 3).c_str());
-			else if (str.find("Content-Type: ") == 0)
-				_type = str.substr(14, str.size());
-			i += str.size() + 2;
-		}
-		while (_response.find("\r\n", j) == j)
-			j -= 2;
-
-		_response = _response.substr(i, j - i);
+		if (_response.find("Status: 500") != std::string::npos)
+			_response = this->readHtml(_errorMap[500]);
+		if (_response.find("<html>") != std::string::npos)
+			_type = "text/html";
 	}
 	else
 	{
@@ -219,7 +169,6 @@ std::string         Response::getPage_autoindex()
 	if (path != _root)
     	dirName = "/" + path.substr(path.find(_root) + _root.size(), path.size());
 
-	// std::cout << "{PATH}" << dirName << std::endl;
 	char* ppath = const_cast<char*>(path.c_str());
     DIR *dir = opendir(ppath);
     std::string page =\
@@ -275,7 +224,6 @@ int				Response::readContent(void)
 	if (_type == ".mp4")
 		_type = "video/mp4";
 	_response = "";
-	// std::cout << "{PATH}" << _path << _index << std::endl;
 	if (_isAutoIndex && !pathIsFile(_path))
 	{
 		buffer << this -> getPage_autoindex();
@@ -286,10 +234,6 @@ int				Response::readContent(void)
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
-			/* 
-			"Запрещено". У клиента нет прав доступа к содержимому,
-			 поэтому сервер отказывается дать надлежащий ответ.
-			 */ 	
 			_response = this->readHtml(_errorMap[403]);
 			return (403);
 		}
@@ -302,14 +246,9 @@ int				Response::readContent(void)
 	else if (pathIsFile(_path + _index))
 	{
 		std::string file_with_index = _path + _index;
-		// std::cout << _path + _index << std::endl;
 		file.open(file_with_index.c_str(), std::ifstream::in);
 		if ((file).is_open() == false)
 		{
-			/*
-			"Запрещено". У клиента нет прав доступа к содержимому,
-			 поэтому сервер отказывается дать надлежащий ответ.
-			 */ 	
 			_response = this->readHtml(_errorMap[403]);
 			return (403);
 		}
@@ -319,11 +258,7 @@ int				Response::readContent(void)
 		file.close();
 	}
 	else
-	{
-		/*
-		"Не найден". Сервер не может найти запрашиваемый ресурс.
-		 Код этого ответа, наверно, самый известный из-за частоты его появления в вебе. 
-		 */
+	{ 
 		_response = this->readHtml(_errorMap[404]);
 		return (404);
 	}

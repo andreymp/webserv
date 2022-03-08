@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 23:37:44 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/08 20:19:03 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../webserv.hpp"
 
 Request::Request() : host(0), port(0), client_body_size(100), serverName(""), root(""), index(""), methods(3), 
-	loc(10), autoindex(false), method(""), body(""), cgi_path(""), PATH(""), HEAD("") {}
+	loc(10), autoindex(false), method(""), body(""), cgi_path(""), PATH(""), HEAD(""), QUERY("") {}
 Request::~Request() {}
 Request::Request(const Request & other) : host(other.host), port(other.port), client_body_size(other.client_body_size), 
 	serverName(other.serverName), root(other.root), index(other.index), methods(other.methods), loc(other.loc), autoindex(other.autoindex),
