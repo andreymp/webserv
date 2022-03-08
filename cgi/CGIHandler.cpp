@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIHandler.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 23:11:19 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/08 17:19:48 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,15 +39,14 @@ char ** CGIHandler::getEnv() const {
 
 // "" means to add to request
 void CGIHandler::prepareCgiEnv(Request & request) {
-	//envp.insert(std::make_pair("AUTH_TYPE", "")); 
+	envp.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
+	envp.insert(std::make_pair("AUTH_TYPE", "Basic")); 
 	envp.insert(std::make_pair("CONTENT_LENGTH", std::to_string(body.size())));
 	envp.insert(std::make_pair("REDIRECT_STATUS", "200"));
-	envp.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
 	envp.insert(std::make_pair("SCRIPT_NAME", request.getCgiPath()));
 	envp.insert(std::make_pair("SCRIPT_FILENAME", request.PATH + "/" + request.getCgiPath()));
 	envp.insert(std::make_pair("REQUEST_METHOD", request.getMethod()));
 	envp.insert(std::make_pair("PATH_INFO", request.PATH));
-	// envp.insert(std::make_pair("PATH_TRANSLATED", request.getRoot() + "/" + request.getIndex()));
 	envp.insert(std::make_pair("QUERY_STRING", ""));
 	envp.insert(std::make_pair("REMOTE_ADDR", std::to_string(request.getHost())));
 	envp.insert(std::make_pair("REQUEST_URI", request.PATH));
@@ -80,8 +79,11 @@ std::string CGIHandler::exec(const char * filename) {
 	int fds[2] = {fileno(fin), fileno(fout)};
 	std::string res = "";
 	
-	const char * path = (request.PATH + "/" + std::string(filename)).c_str();
-	std::cerr << path << std::endl;
+	int i = -1;
+	// while (env[++i])
+	// 	std::cout << env[i] << std::endl;
+	std::string path = request.PATH + "/" + std::string(filename);
+	// std::cerr << path << std::endl;
 	write(fds[0], body.c_str(), body.size());
 	lseek(fds[0], 0, SEEK_SET);
 	pid_t pid = fork();
@@ -92,22 +94,26 @@ std::string CGIHandler::exec(const char * filename) {
 	if (!pid) {
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fds[1], STDOUT_FILENO);
-		char * const * argv = nullptr;
-		execve("/usr/bin/php", argv, env); // тут так
+		// char ** argv = new char*[3];
+		// argv[0] = new char[std::strlen("pages/php-cgi") + 1];
+		// argv[1] = new char[path.size() + 1];
+		// std::strcpy(argv[0], "pages/php-cgi");
+		// std::strcpy(argv[1], path.c_str());
+		// argv[2] = nullptr;
+		execve(path.c_str(), nullptr, env);
 		std::cerr << "Execve failure\n" << strerror(errno) << std::endl;
 		write(fds[1], SERVER_ERROR, std::strlen(SERVER_ERROR));
-		delete [] argv[0];
-		delete [] argv[1];
 		exit(EXIT_FAILURE);
 	} else {
 		int ret;
 		
-		waitpid(-1, nullptr, 0);
+		waitpid(0, nullptr, 0);
 		lseek(fds[1], 0, SEEK_SET);
 		char buff[DEFUALT_SIZE + 1] = {0};
-		while ((ret = read(fds[1], buff, DEFUALT_SIZE)) > 0)
+		while ((ret = read(fds[1], buff, DEFUALT_SIZE)) > 0) {
 			res += buff;
+		}
 		closeFunction(in, out, fin, fout, fds, env);
 	}
-	return res;
+	return res + END;
 }

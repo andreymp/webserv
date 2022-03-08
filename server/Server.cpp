@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 04:15:15 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/08 17:01:59 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int Server::send(int socket_fd) {
 	if (sentMessages.find(socket_fd) == sentMessages.end())
 		sentMessages.insert(std::make_pair(socket_fd, 0));
 	if (!sentMessages[socket_fd])
-		std::cout << "\033[0;32m" << "SEND:" << std::endl << messages[socket_fd] << "\033[0m" <<  std::endl;
+		std::cout << "\033[0;32m" << "SEND:" << std::endl << messages[socket_fd].substr(0, 1000) << "\033[0m" <<  std::endl;
 	std::string msgToSend = messages[socket_fd].substr(sentMessages[socket_fd], DEFUALT_SIZE);
 	int ret = ::send(socket_fd, msgToSend.c_str(), msgToSend.size(), 0);
 	if (ret >= 0) {
@@ -114,7 +114,7 @@ int Server::send(int socket_fd) {
 */
 
 void Server::recieveHandler(int socket_fd) {
-	std::cout << "socket_fd" << socket_fd << std::endl; 
+	//std::cout << "socket_fd" << socket_fd << std::endl; 
 	std::size_t chunk = messages[socket_fd].find(CHUNK);
 	if (chunk != std::string::npos && chunk < messages[socket_fd].find(END))
 		handleChunk(socket_fd);
@@ -178,7 +178,7 @@ void Server::recieveHandler(int socket_fd) {
 			response._response += "HTTP/1.1 301 Moved Permanently\n";
 			std::string redir_server = "http://localhost:400";
 			response._response += "Location: " + redir_server + \
-								request.HEAD +  "\n\r\n\r";
+								request.HEAD +  END;
 		}
 		else
 			response.call(request);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 03:25:15 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/08 18:01:42 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,20 +128,20 @@ void			Response::getMethod(Request & request)
 		size_t		j = _response.size() - 2;
 
 		_response = cgi.exec(request.getCgiPath().c_str());
+		// while (_response.find(END, i) != std::string::npos || _response.find("\r\n", i) == i)
+		// {
+		// 	std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
+		// 	if (str.find("Status: ") == 0)
+		// 		_code = std::atoi(str.substr(8, 3).c_str());
+		// 	i += str.size() + 2;
+		// }
+		// while (_response.find("\r\n", j) == j)
+		// 	j -= 2;
 
-		while (_response.find(END, i) != std::string::npos || _response.find("\r\n", i) == i)
-		{
-			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
-			if (str.find("Status: ") == 0)
-				_code = std::atoi(str.substr(8, 3).c_str());
-			i += str.size() + 2;
-		}
-		while (_response.find("\r\n", j) == j)
-			j -= 2;
-
-		_response = _response.substr(i, j - i);
+		// _response = _response.substr(i, j - i);
+		// std::cout << "{" + _response + "}" << std::endl;
 	}
-	if  (_code == 200)
+	else if  (_code == 200)
 		_code = readContent();
 	else
 		_response = this->readHtml(_errorMap[_code]);
@@ -184,7 +184,7 @@ void			Response::postMethod(Request & request)
 	}
 	if (_code == 500)
 		_response = this->readHtml(_errorMap[_code]);
-	//_response = head.getHeader(_response.size(), _path, _code, _type, request.getLocation(), request.getLang()) + "\r\n" + _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, request.PATH, request.get_language()) + "\r\n" + _response;
 }
 
 void			Response::deleteMethod(Request & __unused request)
