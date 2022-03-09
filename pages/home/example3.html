@@ -1,0 +1,27 @@
+<form>
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title> Feedback</title>
+			<meta http-equiv="Content-Type" content="text/html"; charset="=utf08">
+			<!-- <link rel="icon" href="data:;base64,="> -->
+		</head>
+		<body>
+			<h1>Feedback with GET methode - PHP script</h1>
+			<form action="../welcome" method = "GET">
+				<p><input type="text" name="fio" value="">
+				<p><textarea name="message" rows=10 cols="=40"></textarea>
+				<p><input type="submit" value="send message">
+			</form>
+			<h1>Feedback with POST methode - PHP script</h1>
+			<form action="../welcome" method = "POST">
+				<p><input type="text" name="fio" value="">
+				<p><input type="submit" value="send message">
+			</form>
+			<h1>Download file to server</h1>
+			<form enctype="multipart/form-data" method="post">
+				<p><input type="file" name="f">
+				<input type="submit" value="sends"></p>
+			</form>
+		</body>
+	</html>
