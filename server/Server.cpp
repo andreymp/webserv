@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 21:39:37 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 15:44:48 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,13 +105,6 @@ int Server::send(int socket_fd) {
 		return ret;
 	}
 }
-/*
-	IF REDIRECT : 
-	
-	HTTP/1.1 301 Moved Permanently 
-	Location: http://www.example.org/index.asp
-	но там есть еще 302
-*/
 
 void Server::recieveHandler(int socket_fd) { 
 	std::size_t chunk = messages[socket_fd].find(CHUNK);
@@ -133,10 +126,8 @@ void Server::recieveHandler(int socket_fd) {
 			}
 		if (messages[socket_fd].find("GET") == 0)
 			request.setMethod("GET");
-		else if (messages[socket_fd].find("POST") == 0) {
+		else if (messages[socket_fd].find("POST") == 0)
 			request.setMethod("POST");
-			request.QUERY = messages[socket_fd].substr(messages[socket_fd].find("?"));
-		}
 		else if (messages[socket_fd].find("DELETE") == 0)
 			request.setMethod("DELETE");
 		else
@@ -194,7 +185,11 @@ void Server::handleChunk(int socket_fd) {
 }
 
 
-void Server::closeServer(int socket_fd) const { close(socket_fd); }
+void Server::closeServer(int socket_fd) { 
+	if (socket_fd > 0) 
+		close(socket_fd); 
+	messages.erase(socket_fd);
+}
 
 void Server::setup() {
 	if ((server_fd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {

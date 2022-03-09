@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 21:22:37 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 13:52:30 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
 	envp.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));
 	envp.insert(std::make_pair("name", "qwerty"));
-	envp.insert(std::make_pair("email", "hhh"));
+	// envp.insert(std::make_pair("email", "hhh"));
 	// std::cout << request.getBody() << std::endl;
 	
 	// std::string tmp;
@@ -127,7 +127,7 @@ std::string CGIHandler::exec(const char * filename) {
 	if (pid == -1) {
 		std::cerr << "Fork failure" << std::endl;
 		return SERVER_ERROR;
-	}
+	} 
 	if (!pid) {
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fds[1], STDOUT_FILENO);
