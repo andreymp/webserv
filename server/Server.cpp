@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 15:57:18 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 19:47:19 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,10 @@ int Server::recieve(int socket_fd) {
 	char buffer[DEFUALT_SIZE + 1];
 	int ret = recv(socket_fd, buffer, DEFUALT_SIZE, 0);
 	if (ret == -1) {
-		closeServer(socket_fd);
 		std::cout << "Error while reading" << std::endl;
 		return ret;
 	}
 	if (!ret) {
-		closeServer(socket_fd);
 		std::cout << "Connection closed by client" << std::endl;
 		return ret;
 	}
@@ -200,7 +198,6 @@ void Server::setup() {
 	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
 	setAddress();
-	// std::cout << "SERVER FD" << server_fd << std::endl;
 	if ((bind(server_fd, (struct sockaddr *) &address, sizeof(address))) < 0) {
 		std::cerr << "Bind failure" << std::endl;
 		throw Server::ServerException();

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 15:58:38 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 19:49:44 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,19 +117,16 @@ void			Response::postMethod(Request & request)
 {
 	ResponseHeader	head;
 
-	// std::cout << "request.getCgiPath()" << request.getCgiPath() << std::endl;
-	// request.setCgiPath(request.PATH);
-	// if (request.getCgiPath() != "") {
-	// 	request.setCgiPath("");
+	request.setCgiPath("hui");
+	if (request.getCgiPath() != "") {
+		request.setCgiPath("");
 		CGIHandler	cgi(request);
 		_response = cgi.exec(request.getCgiPath().c_str());
-		if (_response.find("Status: 500") != std::string::npos)
+		if (_response.find("Status: 500"))
 			_code = 500;
 		if (_response.find("<html>") != std::string::npos)
 			_type = "text/html";
-	}
-	else
-	{
+	} else {
 		_code = 204;
 		_response = "";
 	}

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 15:57:28 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 19:51:41 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ CGIHandler & CGIHandler::operator=(const CGIHandler & other) {
 CGIHandler::~CGIHandler() {}
 const char * CGIHandler::CGIHandlerException::what() const throw() { return "CGIHandler exception occured!"; }
 
-char ** CGIHandler::getEnv() const {
+char ** CGIHandler::getEnv() const {	
 	char **env = new char* [envp.size() + 1];
 	std::map<std::string, std::string>::const_iterator it = envp.begin();
 	for (std::size_t j = 0; it != envp.end(); ++it, ++j) {
@@ -33,6 +33,7 @@ char ** CGIHandler::getEnv() const {
 		std::string tmp = it->first + '=' + it->second;
 		std::strcpy(env[j], tmp.c_str());
 	}
+	int j = 0;
 	env[envp.size()] = nullptr;
 	return env;
 }
@@ -40,7 +41,7 @@ char ** CGIHandler::getEnv() const {
 void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
 	envp.insert(std::make_pair("AUTH_TYPE", "Basic")); 
-	envp.insert(std::make_pair("CONTENT_LENGTH", std::to_string(body.size())));
+	envp.insert(std::make_pair("CONTENT_LENGTH", ""));
 	envp.insert(std::make_pair("REDIRECT_STATUS", "200"));
 	envp.insert(std::make_pair("SCRIPT_NAME", request.getCgiPath()));
 	envp.insert(std::make_pair("SCRIPT_FILENAME", request.PATH + "/" + request.getCgiPath()));
@@ -53,7 +54,6 @@ void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("SERVER_PORT", std::to_string(request.getPort())));
 	envp.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
 	envp.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));
-	envp.insert(std::make_pair("name", "qwerty"));
 	// envp.insert(std::make_pair("email", "hhh"));
 	// std::cout << request.getBody() << std::endl;
 	
@@ -116,13 +116,7 @@ std::string CGIHandler::exec(const char * filename) {
 	int fds[2] = {fileno(fin), fileno(fout)};
 	std::string res = "";
 	
-	// int i = -1;
-	// while (env[++i])
-	// 	std::cout << env[i] << std::endl;
-	// std::string path = std::string(filename) == "" ? request.PATH : request.PATH + "/" + std::string(filename);
-	std::string path = "/Users/celys/Desktop/main_123/pages/welcome.php";
-	// std::cout << path.c_str() << std::endl;
-	// std::cout << path << std::endl;
+	std::string path = std::string(filename) == "" ? request.PATH : request.PATH + "/" + std::string(filename);
 	write(fds[0], body.c_str(), body.size());
 	lseek(fds[0], 0, SEEK_SET);
 	pid_t pid = fork();
@@ -133,21 +127,19 @@ std::string CGIHandler::exec(const char * filename) {
 	if (!pid) {
 		dup2(fds[0], STDIN_FILENO);
 		dup2(fds[1], STDOUT_FILENO);
-		std::cerr << path.c_str() << std::endl;
 		execve(path.c_str(), nullptr, env);
-		std::cerr << "Execve failure\n" << strerror(errno) << std::endl;
+		std::cerr << "Execve failure" << std::endl;
 		write(fds[1], SERVER_ERROR, std::strlen(SERVER_ERROR));
 		exit(EXIT_FAILURE);
 	} else {
 		int ret;
 		
-		waitpid(pid, nullptr, 0);
+		waitpid(0, nullptr, 0);
 		lseek(fds[1], 0, SEEK_SET);
 		char buff[DEFUALT_SIZE + 1] = {0};
 		while ((ret = read(fds[1], buff, DEFUALT_SIZE)) > 0) {
 			res += buff;
 		}
-		// std::cout << res << std::endl;
 		closeFunction(in, out, fin, fout, fds, env);
 	}
 	return res + END;

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 12:17:22 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 12:18:32 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 19:48:15 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,8 @@ std::string		ResponseHeader::writeHeader(void)
 		header += "Retry-After: " + _retryAfter + "\r\n";
 	if (_server != "")
 		header += "Server: " + _server + "\r\n";
-	// if (_transferEncoding != "")
-	// 	header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
 	if (_wwwAuthenticate != "")
 		header += "WWW-Authenticate: " + _wwwAuthenticate + "\r\n";
-	// header += "\r\n";
 
 	return (header);
 }
@@ -228,18 +225,6 @@ void			ResponseHeader::setLocation(int code, const std::string& redirect)
 		_location = redirect;
 	}
 }
-
-/*
-Retry-After заголовок HTTP ответа показывает,
-как долго клиент должен подождать перед последующим запросом. 
-Есть три основных случая, в которых следует использовать этот заголовок:
-Когда отправлен с кодом 503 (Service Unavailable), отображая примерное время, 
-через которое сервис будет доступен.
-Когда отправлен с кодом 429 (Too Many Requests), отображая, сколько ждать 
-перед следующим запросом.
-Когда отправлен с кодом переадресации (например, 301 (Moved Permanently)),
- отображает минимальное время, которое клиент должен подождать перед переадресацией.
-*/
 
 void			ResponseHeader::setRetryAfter(int code, int sec)
 {
