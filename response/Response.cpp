@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 14:12:32 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 15:56:35 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,9 +117,10 @@ void			Response::postMethod(Request & request)
 {
 	ResponseHeader	head;
 
-	request.setCgiPath(request.PATH);
-	if (request.getCgiPath() != "") {
-		request.setCgiPath("");
+	// std::cout << "request.getCgiPath()" << request.getCgiPath() << std::endl;
+	// request.setCgiPath(request.PATH);
+	// if (request.getCgiPath() != "") {
+	// 	request.setCgiPath("");
 		CGIHandler	cgi(request);
 		_response = cgi.exec(request.getCgiPath().c_str());
 		if (_response.find("Status: 500") != std::string::npos)
@@ -135,6 +136,9 @@ void			Response::postMethod(Request & request)
 	if (_code == 500)
 		_response = this->readHtml(_errorMap[_code]);
 	_response = head.getHeader(_response.size(), _path, _code, _type, request.PATH, request.get_language()) + "\r\n" + _response;
+			std::cout << "AFTER" << std::endl;
+		std::cout << _response << std::endl;
+		
 }
 
 void			Response::deleteMethod(Request & __unused request)
