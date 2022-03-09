@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 19:49:44 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 20:44:59 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,10 @@ void			Response::getMethod(Request & request)
 	if (request.getCgiPath() != "") {
 		CGIHandler	cgi(request);
 		_response = cgi.exec(request.getCgiPath().c_str());
-		if (_response.find("Status: 500") != std::string::npos)
+		if (_response.find("Status: 500") != std::string::npos) {
+			_code = 500;
 			_response = this->readHtml(_errorMap[500]);
+		}
 		if (_response.find("<html>") != std::string::npos)
 			_type = "text/html";
 	} else if  (_code == 200)
@@ -122,8 +124,10 @@ void			Response::postMethod(Request & request)
 		request.setCgiPath("");
 		CGIHandler	cgi(request);
 		_response = cgi.exec(request.getCgiPath().c_str());
-		if (_response.find("Status: 500"))
+		if (_response.find("Status: 500")) {
 			_code = 500;
+			_response = this->readHtml(_errorMap[500]);
+		}
 		if (_response.find("<html>") != std::string::npos)
 			_type = "text/html";
 	} else {

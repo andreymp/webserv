@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 18:08:57 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 19:47:19 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/09 20:45:48 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ int Server::recieve(int socket_fd) {
 	char buffer[DEFUALT_SIZE + 1];
 	int ret = recv(socket_fd, buffer, DEFUALT_SIZE, 0);
 	if (ret == -1) {
+		close(socket_fd);
 		std::cout << "Error while reading" << std::endl;
 		return ret;
 	}
