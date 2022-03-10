@@ -3,7 +3,7 @@
 <html>
 <body>
 
-Welcome <?php echo $name; ?><br>
+Welcome <?php echo $_POST["fio"]; ?><br>
 
 </body>
 </html>

@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 13:24:48 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 20:18:43 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/10 21:14:33 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ class Request {
 		~Request();
 		void setHost(unsigned int _host);
 		void setPort(int _port);
+		void setPortToredirect(int _port);
 		void setClientBodySize(int _size);
 		void setServerName(std::string const & _name);
 		void setRoot(std::string const & path);
@@ -36,6 +37,7 @@ class Request {
 		void set_language(std::string language);
 
 		unsigned int getHost() const;
+		int getPortToredirect() const;
 		std::string const & getMethod() const ; 
 		int getPort() const;
 		int getClinetBodySize() const;
@@ -51,6 +53,7 @@ class Request {
 		std::string PATH;
 		std::string HEAD;
 		std::string QUERY;
+		std::string CGIArgs;
 	private:
 		unsigned int host;
 		int port;
@@ -65,6 +68,7 @@ class Request {
 		std::vector<location> loc;
 		std::string language;
 		bool autoindex;
+		int portToredirect;
 };
 
 #endif

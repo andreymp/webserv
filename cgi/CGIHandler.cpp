@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 17:51:55 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 19:51:41 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/10 21:01:08 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,43 +54,47 @@ void CGIHandler::prepareCgiEnv(Request & request) {
 	envp.insert(std::make_pair("SERVER_PORT", std::to_string(request.getPort())));
 	envp.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
 	envp.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));
-	// envp.insert(std::make_pair("email", "hhh"));
-	// std::cout << request.getBody() << std::endl;
 	
-	// std::string tmp;
-	// tmp = request.getBody();
-	// int pos_start_key = 0;
-	// int pos_start_value = 0;
-	// int pos_end_key = 0;
-	// int pos_end_value = 0;
-	// while (tmp.find("&") != std::string::npos)
-	// {
-	// 	int pos_end_key = tmp.find("=");
-	// 	int pos_end = tmp.find("=");
-	// 	std::string key = tmp.substr(pos_start_key, pos_end_key);
-	// 	std::string value = tmp.substr(pos_end_key + 1, pos_end_value);
-	// 	envp.insert(std::make_pair(key, value));
-	// 	pos_start_key = pos_end_value + 1;
-	// 	// std::cout << key << value << std::endl;
-	// 	tmp = tmp.substr(pos_end, tmp.size());
-	// }
-	
-	// envp.insert(std::make_pair(request.QUERY.substr(pos + 1, equal - pos - 1), request.QUERY.substr(equal + 1, ending - equal - 1))
-	// if (request.QUERY != "") {
-	// 	std::size_t end = request.QUERY.find("\r\n");
-	// 	std::size_t pos = request.QUERY.find(END) + 4;
-	// 	std::size_t equal = 0;
-	// 	std::size_t ending = 0;
-	// 	while (pos != end) {
-	// 		equal = request.QUERY.find('=', equal + 1);
-	// 		ending = request.QUERY.find('&', ending + 1);
-	// 		if (ending == std::string::npos)
-	// 			ending = end;
-	// 		envp.insert(std::make_pair(request.QUERY.substr(pos + 1, equal - pos - 1), request.QUERY.substr(equal + 1, ending - equal - 1)));
-	// 		std::cout << request.QUERY.substr(pos + 1, equal - pos - 1) + " + " + request.QUERY.substr(equal + 1, ending - equal - 1) << std::endl;
-	// 		pos = ending;
-	// 	}
-	// }
+	if (request.CGIArgs != "") {
+		int j = 0;
+		int size = 1;
+		for (int i = 0; i < request.CGIArgs.size(); i++)
+			if (request.CGIArgs[i] == '&')
+				size++;
+		while (size--) {
+			std::string value;
+			std::size_t i = request.CGIArgs.find('=', j);
+			std::string key = request.CGIArgs.substr(j, i - j);
+			j = request.CGIArgs.find("&", i) + 1;
+			if (j == std::string::npos) {
+				value = request.CGIArgs.substr(i + 1);
+				envp.insert(std::make_pair(key, value));
+				break;
+			}
+			value = request.CGIArgs.substr(i + 1, j - i - 2);
+			envp.insert(std::make_pair(key, value));
+		}
+	}
+	if (request.getMethod() == "POST") {
+		int j = 0;
+		int size = 1;
+		for (int i = 0; i < body.size(); i++)
+			if (body[i] == '&')
+				size++;
+		while (size--) {
+			std::string value;
+			std::size_t i = body.find('=', j);
+			std::string key = body.substr(j, i - j);
+			j = body.find("&", i) + 1;
+			if (j == std::string::npos) {
+				value = body.substr(i + 1);
+				envp.insert(std::make_pair(key, value));
+				break;
+			}
+			value = body.substr(i + 1, j - i - 2);
+			envp.insert(std::make_pair(key, value));
+		}
+	}
 }
 
 void CGIHandler::closeFunction(int in, int out, FILE * fin, FILE * fout, int fds[], char ** env) {
@@ -134,12 +138,11 @@ std::string CGIHandler::exec(const char * filename) {
 	} else {
 		int ret;
 		
-		waitpid(0, nullptr, 0);
+		waitpid(-1, nullptr, 0);
 		lseek(fds[1], 0, SEEK_SET);
 		char buff[DEFUALT_SIZE + 1] = {0};
-		while ((ret = read(fds[1], buff, DEFUALT_SIZE)) > 0) {
+		while ((ret = read(fds[1], buff, DEFUALT_SIZE)) > 0)
 			res += buff;
-		}
 		closeFunction(in, out, fin, fout, fds, env);
 	}
 	return res + END;

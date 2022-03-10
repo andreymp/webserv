@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/23 16:16:51 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 19:47:45 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/10 22:12:32 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ void ServerHandler::setup() {
 	}
 	if (maxFD <= 0)
 		throw ServerHandler::ServerHandlerException();
-	
 }
 
 void ServerHandler::closeConnection() {

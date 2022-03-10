@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:14:07 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/08 04:00:21 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/10 21:33:55 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,6 @@
 
 
 std::vector<int> fd;
-
-// void endServer(int __unused signal)
-// {
-// 	std::cout << "CLOSE DONE!" << std::endl;
-// 	for (std::vector<int>::iterator it = fd.begin(); it != fd.end(); ++it)
-// 	{
-// 		std::cout << "IT:" <<  *it << std::endl;
-// 	}
-// 	exit(0);
-// }
 
 bool checkArgs(int argc, char **argv) {
 	if (argc > 2)
@@ -45,14 +35,10 @@ int main(int argc, char **argv) {
 	}
 	Config conf(argc == 1 ? "./configs/default.config" : argv[1]);
 	try {
-		// signal(SIGINT, endServer);
 		std::vector<Request> requests(conf.parse());
 		ServerHandler server(requests);
 		server.setup();
-
-		int i = 0;
-		server.servers.rbegin()->second.server_for_redir = 1; //тут чтобы проверить
-		// fd = server.vec_fd;
+		server.get_fd();
 		server.launch();
 		server.closeConnection();
 	} catch (const std::exception & e) {

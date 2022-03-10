@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 17:51:45 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 15:44:54 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/10 22:04:25 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ class Server {
 		void handleChunk(int socket_fd);
 		int makeNonBlocking();
 		void recieveHandler(int socket_fd);
-		int server_for_redir; // индекс сервера (ServerHandler:: std::map<int, Server> servers;),  -1 если редиректа нет
+		int server_for_redir;
+		int getPort() const;
 		class ServerException : public std::exception {
 			virtual const char * what() const throw();
 		};
@@ -45,6 +46,7 @@ class Server {
 		std::map<int, std::string> messages;
 
 		void setAddress();
+		void loadFile(int socket_fd);
 };
 
 #endif

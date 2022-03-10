@@ -6,7 +6,7 @@
 /*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 12:48:30 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/09 20:44:59 by jobject          ###   ########.fr       */
+/*   Updated: 2022/03/10 19:57:07 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 #include "ResponseHeader.hpp"
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <fstream>      // std::ifstream
-#include <sstream>      // std::stringstream
+#include <fstream>
+#include <sstream>
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -96,6 +96,19 @@ void			Response::getMethod(Request & request)
 {
 	ResponseHeader	head;
 
+	if (request.CGIArgs != "") {
+		std::ifstream file(request.PATH + request.getIndex());
+		while (!file.eof()) {
+			std::string tmp;
+			std::getline(file, tmp);
+			std::size_t temp = tmp.find("action=\"");
+			if (temp != std::string::npos) {
+				request.setCgiPath(tmp.substr(temp + std::strlen("action=\""), tmp.find(" ", temp + 1) - temp - std::strlen("action=\"") - 1));
+				break ;
+			}
+		}
+		file.close();
+	}
 	if (request.getCgiPath() != "") {
 		CGIHandler	cgi(request);
 		_response = cgi.exec(request.getCgiPath().c_str());
@@ -119,12 +132,19 @@ void			Response::postMethod(Request & request)
 {
 	ResponseHeader	head;
 
+	if (request.QUERY == "file") {
+		_code = 200;
+		_code = readContent();
+		_type = "text/html";
+		_response = head.getHeader(_response.size(), _path, _code, _type, request.PATH, request.get_language()) + "\r\n" + _response;
+		return ;
+	}
 	request.setCgiPath("hui");
 	if (request.getCgiPath() != "") {
 		request.setCgiPath("");
 		CGIHandler	cgi(request);
 		_response = cgi.exec(request.getCgiPath().c_str());
-		if (_response.find("Status: 500")) {
+		if (_response.find("Status: 500") != std::string::npos) {
 			_code = 500;
 			_response = this->readHtml(_errorMap[500]);
 		}
@@ -158,10 +178,6 @@ void			Response::deleteMethod(Request & __unused request)
 	std::string ContentLocation = request.getRoot();
 	_response = head.getHeader(_response.size(), _path, _code, _type, ContentLocation, _language) + "\r\n" + _response;
 }
-
-
-// Utils
-
 
 std::string         Response::getPage_autoindex() 
 {

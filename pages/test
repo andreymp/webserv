@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo hi $fio
+echo your wrote $info
+echo your phone is $number

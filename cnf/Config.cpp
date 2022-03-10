@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: celys <celys@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jobject <jobject@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 12:37:06 by jobject           #+#    #+#             */
-/*   Updated: 2022/03/07 19:43:00 by celys            ###   ########.fr       */
+/*   Updated: 2022/03/10 21:32:29 by jobject          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,8 +119,7 @@ Request Config::parseServer(std::size_t & i, std::string const & file) const {
 		} else if (!file.compare(i, std::strlen("location "), "location ")) {
 			i += std::strlen("location ");
 			locales.push_back(parseLocation(i, file));
-		}
-		else if (!file.compare(i, std::strlen("listen "), "listen ")) {
+		} else if (!file.compare(i, std::strlen("listen "), "listen ")) {
 			i += std::strlen("listen ");
 			std::size_t tmp = file.find(':', i);
 			if (tmp == std::string::npos)
@@ -132,6 +131,16 @@ Request Config::parseServer(std::size_t & i, std::string const & file) const {
 			req.setPort(std::atoi(file.substr(tmp, eol - tmp).c_str()));
 			req.setHost(hostToUInt(file.substr(i, tmp - i)));
 			i = eol + 1;
+		} else if (!file.compare(i, std::strlen("redirect "), "redirect ")) {
+			i += std::strlen("redirect ");
+			std::size_t j = file.find(':', i);
+			if (j == std::string::npos)
+				throw Config::ConfigException();
+			std::size_t tmp = file.find('\n', i);
+			if (tmp == std::string::npos)
+				throw Config::ConfigException();
+			req.setPortToredirect(std::atoi(file.substr(j + 1, tmp - j - 1).c_str()));
+			i = tmp;
 		} else if (!file.compare(i, std::strlen("client_body_size "), "client_body_size ")) {
 			i += std::strlen("client_body_size ");
 			std::size_t tmp = file.find('\n', i);
